@@ -1,0 +1,10 @@
+# Build trees and installs
+/build*/
+/out/
+/install/
+
+# IDE state
+/.vs/
+/.vscode/
+CMakeUserPresets.json
+*.user

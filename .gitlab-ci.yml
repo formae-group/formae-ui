@@ -1,0 +1,49 @@
+# .gitlab-ci.yml - builds formae-ui, its example and its tests with MSVC on
+# GitLab's Windows runner, runs the headless smoke test and the example's
+# off-screen self-test (SDL's software renderer, hidden window), checks the
+# installed package with tests/package, and keeps the self-test PNGs. A
+# vMAJOR.MINOR.PATCH tag also publishes the GitLab release, described by the
+# annotated tag's message (the CHANGELOG.md section).
+stages:
+  - build
+  - release
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  SDL2_VERSION: "2.30.9"
+
+windows-msvc:
+  stage: build
+  tags:
+    - saas-windows-medium-amd64
+  script:
+    - $ErrorActionPreference = "Stop"
+    - if (-not (Get-Command cmake -ErrorAction SilentlyContinue)) { choco install -y --no-progress cmake --installargs 'ADD_CMAKE_TO_PATH=System'; $env:Path += ";C:\Program Files\CMake\bin" }
+    - Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/libsdl-org/SDL/releases/download/release-$env:SDL2_VERSION/SDL2-devel-$env:SDL2_VERSION-VC.zip" -OutFile sdl2.zip
+    - Expand-Archive sdl2.zip -DestinationPath deps
+    - $sdl = "$PWD/deps/SDL2-$env:SDL2_VERSION/cmake"
+    - cmake -S . -B build -G "Visual Studio 17 2022" -A x64 "-DSDL2_DIR=$sdl"
+    - cmake --build build --config Release --parallel
+    - $env:SDL_RENDER_DRIVER = "software"
+    - ctest --test-dir build -C Release --output-on-failure
+    - cmake --install build --config Release --prefix "$PWD/install"
+    - cmake -S tests/package -B build-package -G "Visual Studio 17 2022" -A x64 "-DCMAKE_PREFIX_PATH=$PWD/install"
+    - cmake --build build-package --config Release
+    - ctest --test-dir build-package -C Release --output-on-failure
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+      - build/examples/selftest/
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+  script:
+    - echo "Publishing formae-ui $CI_COMMIT_TAG"
+  release:
+    tag_name: $CI_COMMIT_TAG
+    name: formae-ui $CI_COMMIT_TAG
+    description: $CI_COMMIT_TAG_MESSAGE

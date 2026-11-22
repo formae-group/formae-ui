@@ -1,0 +1,22 @@
+# formae-ui-config.cmake - find_package(formae-ui CONFIG): the imported
+# target formae::ui and the function formae_ui_embed_file.
+#
+# Define your Dear ImGui target before find_package. formae::ui links the
+# target named by FORMAE_UI_IMGUI_TARGET (default "imgui"), which must be the
+# same ImGui version and configuration the library was built against.
+@PACKAGE_INIT@
+
+include("${CMAKE_CURRENT_LIST_DIR}/formae-ui-targets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/FormaeUiEmbed.cmake")
+
+if(NOT DEFINED FORMAE_UI_IMGUI_TARGET)
+    set(FORMAE_UI_IMGUI_TARGET imgui)
+endif()
+if(NOT TARGET "${FORMAE_UI_IMGUI_TARGET}")
+    set(formae-ui_FOUND FALSE)
+    set(formae-ui_NOT_FOUND_MESSAGE "formae-ui needs your Dear ImGui target '${FORMAE_UI_IMGUI_TARGET}' to exist before find_package (or set FORMAE_UI_IMGUI_TARGET)")
+    return()
+endif()
+target_link_libraries(formae::ui INTERFACE "${FORMAE_UI_IMGUI_TARGET}")
+
+check_required_components(formae-ui)

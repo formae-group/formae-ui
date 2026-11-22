@@ -1,0 +1,7 @@
+# Sources and text in CRLF on every checkout; images and fonts untouched.
+* text=auto eol=crlf
+*.png binary
+*.jpg binary
+*.ico binary
+*.ttf binary
+*.otf binary
