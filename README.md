@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/logo/formae-ui.svg" alt="formae-ui" width="160">
+
 # formae-ui
 
 A Dear ImGui menu library for PC ports: themed settings menus, input rebinding, About pages and first-run screens.
@@ -241,6 +243,7 @@ as described in [SECURITY.md](SECURITY.md).
 
 ## License
 
-formae-ui is released under the [MIT license](LICENSE), copyright Formae. It bundles
+formae-ui is released under the [MIT license](LICENSE), copyright Formae. The logo in
+[assets/logo](assets/logo) is Formae's own artwork, under the same license. It bundles
 [stb_image](https://github.com/nothings/stb) (public domain) to decode logos. Dear ImGui (MIT) and
 SDL2 (zlib), used by the example, are under their own licenses.

@@ -6,6 +6,10 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- The formae-ui logo (`assets/logo/`: SVG master, 512 and 256 px PNG) at the top of the README.
+
 ## [0.1.0] - 2026-11-22
 
 ### Added
