@@ -6,9 +6,12 @@
 //                                   game picture; Escape or Start opens and
 //                                   closes the menu over it
 //   formae_ui_demo --selftest DIR   a hidden window; every page is drawn off
-//                                   screen at a fixed size and 96 DPI and
-//                                   written to DIR as a PNG; exit code 0 when
-//                                   every PNG was written
+//                                   screen at a fixed size, 96 DPI and a
+//                                   fixed frame time and written to DIR as a
+//                                   PNG; the Mods page is also shot after
+//                                   scripted key presses that pick a row up
+//                                   and move it; exit code 0 when every PNG
+//                                   was written
 //
 // Settings and bindings live in memory only. Everything here is what a game
 // supplies: the pages and their texts, the binding names and encoding, the
@@ -47,6 +50,10 @@ struct Settings {
     bool vsync = false;
     bool vsync_started = true;
     int volume = 70;
+    bool mods = true;
+    bool mods_started = true;
+    bool mods_changed = false;
+    const char *mods_status = nullptr;
 };
 
 const char *const ACTIONS[] = { "Jump", "Attack", "Pause", "Menu" };
@@ -54,6 +61,14 @@ const int ACTION_COUNT = 4;
 const int MENU_ROW = 3;
 
 Settings settings;
+std::vector<ui::ListRow> mods = {
+    { "sharper-tiles", "Sharper Tiles", "1.2.0 - Pixel Workshop", "", true },
+    { "night-palette", "Night Palette", "0.9.1 - Dusk Collective", "", true },
+    { "orchestral-title", "Orchestral Title", "2.0.0 - Brass Section", "", false },
+    { "speedrun-timer", "Speedrun Timer", "1.0.0 - Split Second", "Made for a different game version", true },
+    { "wide-status-bar", "Wide Status Bar", "0.4.0 - Margins", "", true },
+    { "classic-sounds", "Classic Sounds", "1.1.0 - Chiptune Club", "", true },
+};
 int keys[ACTION_COUNT] = { SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_RETURN, SDL_SCANCODE_ESCAPE };
 int pads[ACTION_COUNT] = { 1 + SDL_CONTROLLER_BUTTON_A, 1 + SDL_CONTROLLER_BUTTON_X, 1 + SDL_CONTROLLER_BUTTON_START,
                            1 + SDL_CONTROLLER_BUTTON_START };
@@ -198,7 +213,20 @@ struct Step {
     int tab, category, capture, popup, w, h;
     ui::Status status;
     const char *name;
+    const char *keys;
 };
+
+ImGuiKey script_key(char c)
+{
+    switch (c) {
+    case 'U': return ImGuiKey_UpArrow;
+    case 'D': return ImGuiKey_DownArrow;
+    case 'L': return ImGuiKey_LeftArrow;
+    case 'R': return ImGuiKey_RightArrow;
+    case 'E': return ImGuiKey_Enter;
+    default: return ImGuiKey_Space;
+    }
+}
 
 const Step SCRIPT[] = {
     { false, 0, 0, -1, -1, 1280, 720, ui::Status::none, "menu_01_settings_general" },
@@ -214,6 +242,8 @@ const Step SCRIPT[] = {
     { true, 0, 0, -1, -1, 1280, 720, ui::Status::none, "first_run_1_welcome" },
     { true, 0, 0, -1, -1, 1280, 720, ui::Status::error, "first_run_2_refused" },
     { true, 0, 0, -1, -1, 1280, 720, ui::Status::ok, "first_run_3_verified" },
+    { false, 0, 4, -1, -1, 1280, 720, ui::Status::none, "menu_11_settings_mods" },
+    { false, 0, 4, -1, -1, 1280, 720, ui::Status::none, "menu_12_settings_mods_moved", "DRREDD" },
 };
 
 bool shot(SDL_Renderer *ren, int w, int h, const std::string &dir, const char *name)
@@ -312,6 +342,28 @@ int main(int argc, char **argv)
                     [&] {
                         ui::section("Player 1");
                         ui::binding_table(*menu_ref, bindings);
+                    } },
+                  { "Mods",
+                    [] {
+                        ui::section("Mods");
+                        ui::toggle("Enable mods", &settings.mods);
+                        ui::tag(settings.mods != settings.mods_started || settings.mods_changed ? ui::restart_to_apply : nullptr);
+                        ui::ListOptions list;
+                        list.visible_rows = 5.0f;
+                        list.header = "Load order";
+                        list.empty = "No mods installed. Put mods in the mods folder, then refresh.";
+                        if (ui::reorder_list("##mods", mods, list).kind != ui::ListEdit::none) settings.mods_changed = true;
+                        ui::note("Mods higher in the list override the ones below them. Changes apply after a restart.");
+                        for (const ui::ListRow &row : mods)
+                            if (!row.error.empty()) {
+                                ui::note((row.name + " cannot be loaded and stays off.").c_str(), ui::Status::error);
+                                break;
+                            }
+                        ImGui::Spacing();
+                        if (ui::inline_button("Open mods folder")) settings.mods_status = "The mods folder would open here.";
+                        ImGui::SameLine();
+                        if (ui::inline_button("Refresh")) settings.mods_status = "Found 6 mods.";
+                        if (settings.mods_status) ui::note(settings.mods_status, ui::Status::ok);
                     } } },
                 nullptr },
               { "About", {}, [&] { ui::about_page(about); } } },
@@ -340,6 +392,7 @@ int main(int argc, char **argv)
             if (s.capture >= 0) menu.begin_capture(&bindings, s.capture, 0);
             else menu.end_capture();
             menu.ask(s.popup);
+            if (s.keys) menu.focus_page();
             welcome.status = s.status;
             welcome.busy = s.status == ui::Status::ok;
             welcome.status_text = s.status == ui::Status::ok ? "Verified. Starting the game."
@@ -388,9 +441,14 @@ int main(int argc, char **argv)
             if (!first) draw_picture(ren, picture, ow, oh);
             ImGui_ImplSDLRenderer2_NewFrame();
             ImGui_ImplSDL2_NewFrame();
+            const int keys_len = s && s->keys ? (int)std::strlen(s->keys) : 0;
             if (s) {
-                ImGui::GetIO().DisplaySize = ImVec2((float)ow, (float)oh);
-                ImGui::GetIO().DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+                ImGuiIO &io = ImGui::GetIO();
+                io.DisplaySize = ImVec2((float)ow, (float)oh);
+                io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+                io.DeltaTime = 1.0f / 60.0f;
+                const int k = frames - 2;
+                if (k >= 0 && k < 2 * keys_len) io.AddKeyEvent(script_key(s->keys[k / 2]), k % 2 == 0);
             }
             ImGui::NewFrame();
             if (first) {
@@ -409,7 +467,7 @@ int main(int argc, char **argv)
             }
             ImGui::Render();
             ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), ren);
-            if (s && ++frames == 6) {
+            if (s && ++frames == 6 + (keys_len ? 2 + 2 * keys_len : 0)) {
                 frames = 0;
                 if (!shot(ren, ow, oh, selftest, s->name)) status = 1;
                 if (++step == sizeof SCRIPT / sizeof SCRIPT[0]) quit = true;

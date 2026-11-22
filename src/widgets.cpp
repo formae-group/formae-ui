@@ -1,6 +1,7 @@
 // widgets.cpp - the controls pages are made of (formae/ui.h): titled
 // section separators, the accent "Restart to apply" tag, toggles, combos,
-// sliders with - and + buttons that repeat while held, full-width buttons,
+// sliders with - and + buttons that repeat while held, full-width and inline
+// buttons, wrapped notes in the dimmed, ok or error colour,
 // the tab and category buttons, the bar's icon buttons drawn with ImDrawList
 // and the centred confirmation dialog.
 //
@@ -98,6 +99,21 @@ bool slider_percent(const char *label, int *value, int lo, int hi, int step, con
 bool button(const char *label)
 {
     return ImGui::Button(label, ImVec2(-FLT_MIN, 0));
+}
+
+bool inline_button(const char *label)
+{
+    return ImGui::Button(label);
+}
+
+void note(const char *text, Status status)
+{
+    const Theme &t = current().theme();
+    ImGui::PushStyleColor(ImGuiCol_Text, status == Status::ok ? t.ok_text : status == Status::error ? t.error_text : t.text_dim);
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextUnformatted(text);
+    ImGui::PopTextWrapPos();
+    ImGui::PopStyleColor();
 }
 
 bool pick_button(const char *label, bool chosen, ImVec2 size)

@@ -15,7 +15,7 @@ formae::ui::Context ui(theme);
 
 | Field | Default | Used for |
 |---|---|---|
-| `accent` | `242, 179, 61` | Chosen tab and category, the rule under the bar, checks, slider grabs, tags, the primary first-run button, navigation cursor |
+| `accent` | `242, 179, 61` | Chosen tab and category, the rule under the bar, checks, slider grabs, tags, the primary first-run button, navigation cursor, the outline of a picked-up list row |
 | `accent_hi` | `252, 200, 102` | Accent elements hovered or held |
 | `on_accent` | `26, 19, 6` | Text on accent fills |
 | `backdrop` | `11, 13, 18` | Behind the menu (alpha from the opacity) and the first-run screen |
@@ -23,12 +23,12 @@ formae::ui::Context ui(theme);
 | `line` | white at 34 | Separators, borders, the sidebar rule |
 | `soft_hover`, `soft_active` | white at 22 / 40 | Unchosen tabs and categories under the pointer or held |
 | `danger`, `danger_hi` | `172, 56, 50` / `204, 74, 66` | Destructive bar buttons |
-| `error_text`, `ok_text` | `239, 112, 100` / `126, 205, 140` | Refusals and success lines |
+| `error_text`, `ok_text` | `239, 112, 100` / `126, 205, 140` | Refusals and success lines, error lines of list rows, notes |
 | `popup` | `24, 28, 36` at 252 | Combo lists and confirmations |
 | `frame`, `frame_hovered`, `frame_active` | `40, 46, 58` ... | Slider, combo and checkbox frames |
 | `button`, `button_hovered`, `button_active` | `44, 51, 64` ... | Buttons |
 | `scrollbar`, `scrollbar_hovered`, `scrollbar_active` | white at 40 / 64 / 90 | Scrollbar grab |
-| `row_alt` | white at 7 | Alternate rows of the credits |
+| `row_alt` | white at 7 | Alternate rows of the credits and of reorderable lists |
 | `modal_dim` | black at 120 | Behind a confirmation |
 | `header_alpha`, `selection_alpha` | 64, 90 | Accent alpha behind a selected combo entry and selected text |
 

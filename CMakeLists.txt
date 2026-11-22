@@ -32,6 +32,7 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in" "${CMAKE_CURRENT
 add_library(formae_ui STATIC
     src/context.cpp
     src/widgets.cpp
+    src/list.cpp
     src/menu.cpp
     src/about.cpp
     src/first_run.cpp)

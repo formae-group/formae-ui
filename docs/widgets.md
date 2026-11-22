@@ -63,6 +63,76 @@ ui::toggle("VSync", &settings.vsync);
 ui::tag(settings.vsync != vsync_at_start ? ui::restart_to_apply : nullptr);
 ```
 
+### note
+
+A paragraph wrapped to the page width, dimmed by default, or in the ok or error colour of the
+theme for `Status::ok` and `Status::error`.
+
+```cpp
+ui::note("Mods higher in the list override the ones below them. Changes apply after a restart.");
+ui::note(error.c_str(), ui::Status::error);
+```
+
+### inline_button
+
+A button as wide as its label (`button` is full width), so several can share a line.
+
+```cpp
+if (ui::inline_button("Open mods folder")) open_mods_folder();
+ImGui::SameLine();
+if (ui::inline_button("Refresh")) rescan_mods();
+```
+
+## Reorderable list
+
+### reorder_list, ListRow, ListEdit, ListOptions
+
+<img src="images/mods.png" alt="Mods page with a reorderable list, a row picked up and moved" width="640">
+
+A list in priority order, such as mods or texture packs, whose rows the player moves and switches
+on or off. Each row has an up and a down button, an enable checkbox, the name, dimmed details after
+it and, when `error` is set, a second line in the error colour; such a row's checkbox is disabled
+and drawn off, but the row can still be moved. Moves and toggles are applied to `rows` in place,
+and the return value says which one happened in this frame (at most one), so the game can save.
+
+```cpp
+std::vector<ui::ListRow> mods = load_mod_list();   // { id, name, detail, error, enabled }
+
+ui::toggle("Enable mods", &settings.mods);
+ui::ListOptions options;
+options.visible_rows = 6.0f;
+options.header = "Load order";
+options.empty = "No mods installed.";
+const ui::ListEdit edit = ui::reorder_list("##mods", mods, options);
+if (edit.kind != ui::ListEdit::none) save_mod_list(mods);   // ids in order, with their enabled flag
+ui::note("Mods higher in the list override the ones below them. Changes apply after a restart.");
+```
+
+| Input | Effect |
+|---|---|
+| Up or down button (click, A, Enter or Space) | Moves the row one place; the focus stays on the button, so pressing again keeps moving the same row |
+| Ctrl or Alt with Up or Down | Moves the row holding the keyboard focus, which stays on it |
+| A, Enter or Space on the name | Picks the row up (accent outline): Up and Down (arrows, D-pad, left stick) move it, A, Enter, Space, B or Escape put it down |
+| Dragging the name with the mouse (`drag`) | Moves the row one place at a time to where the pointer is |
+| Checkbox | Switches the row; returns `ListEdit::toggled` |
+
+`ListEdit` is `moved` with `row` (the index before the move) and `to` (after it), `toggled`
+with `row`, or `none`. ImGui ids come from `ListRow::id`, so the focus, a pick-up and the
+scroll position follow a row when it moves; keep ids unique and stable. A picked-up row is ImGui's
+active item, so `Menu::busy()` is true and `Menu::event` gives Escape and B to ImGui, which puts
+the row down without closing the menu.
+
+| `ListOptions` | Default | Meaning |
+|---|---|---|
+| `visible_rows` | 0 | Height of a scrolling region, in one-line rows; 0 draws every row with no scrolling |
+| `checkboxes` | true | Draw the enable checkbox |
+| `drag` | true | Let the mouse drag rows |
+| `empty` | null | Dimmed text shown when there are no rows |
+| `header` | null | Dimmed caption above the rows |
+
+The scrolling region is a navigation-flattened child: keyboard and gamepad navigation move between
+the page and the rows like any other page items, and a moved row is scrolled into view.
+
 ## Menu
 
 ### Menu, Tab, Category, BarButton

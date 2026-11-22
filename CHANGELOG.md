@@ -8,7 +8,26 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ### Added
 
+- `reorder_list` with `ListRow`, `ListEdit` and `ListOptions`: rows in priority order (mods,
+  packs) with up and down buttons drawn with ImDrawList, an enable checkbox, dimmed details and an
+  error line that disables the checkbox. Rows move with the buttons (the focus stays on the moved
+  row), Ctrl or Alt with Up and Down, a pick-up with A, Enter or Space (Up and Down then move the
+  row; A, Enter, Space, B or Escape put it down, and the menu stays busy so it does not close) or a
+  mouse drag. An optional scrolling region that navigation enters and leaves like the page, a
+  caption and an empty text. Moves and toggles are applied in place and reported once per frame.
+- `note`: a paragraph wrapped to the page in the dimmed, ok or error colour.
+- `inline_button`: a button as wide as its label, for several on one line.
 - The formae-ui logo (`assets/logo/`: SVG master, 512 and 256 px PNG) at the top of the README.
+- Example: a Settings > Mods page, shot by the self-test as drawn and after scripted key presses
+  that pick a row up and move it (`menu_11_settings_mods`, `menu_12_settings_mods_moved`).
+- `tests/list.cpp` (`formae_ui_list`): the list driven headless by keyboard, gamepad and mouse
+  input.
+
+### Changed
+
+- `Status` is declared before the list widgets, which use it too; its values are unchanged.
+- The example's self-test runs at a fixed frame time, so the confirmation shots, whose dimming fades
+  in, are the same on every run.
 
 ## [0.1.0] - 2026-11-22
 

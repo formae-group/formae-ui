@@ -36,6 +36,7 @@ ctest --test-dir build/package -C Release --output-on-failure
 | Check | What it covers |
 |---|---|
 | `formae_ui_smoke` | Every component drawn headless for a few frames; close rules, capture, confirmation |
+| `formae_ui_list` | The reorderable list driven headless by keyboard, gamepad and mouse input |
 | `formae_ui_selftest` | The example's pages drawn off screen in a hidden window, written to `build/examples/selftest/*.png` |
 | `tests/package` | `find_package(formae-ui CONFIG)` from an install, with the consumer's own ImGui target |
 

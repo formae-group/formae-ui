@@ -38,7 +38,11 @@ handles keyboard, mouse and controller navigation.
 - **Menu shell.** A bar of tabs with icon buttons (reset, quit, resume) on its right, a sidebar of
   categories and the chosen category's page, over the game picture dimmed to a configurable opacity.
 - **Widgets.** Titled section separators, toggles, combos, integer and percent sliders with - and +
-  buttons that repeat while held, full-width buttons and a "Restart to apply" tag.
+  buttons that repeat while held, full-width and inline buttons, wrapped notes and a "Restart to
+  apply" tag.
+- **Reorderable lists.** Mods or packs in priority order, moved with up and down buttons, Ctrl or
+  Alt with the arrows, a gamepad pick-up or a mouse drag, and switched with a checkbox; rows can
+  carry details and an error line.
 - **Input rebinding.** A table of actions by device columns with in-place capture: Escape cancels,
   Delete clears, refusals are shown under the table.
 - **Confirmations.** Centred modal questions for destructive actions.
@@ -198,7 +202,8 @@ Everything is in `formae/ui.h`, namespace `formae::ui`; the version is in `forma
 | `Context`, `Theme`, `FontFiles`, `base_size` | ImGui context, colours, fonts and scale |
 | `Menu`, `Tab`, `Category`, `BarButton` | The menu shell, its pages and the bar's buttons |
 | `InputEvent`, `EventResult`, `Menu::event` | Close rules and binding capture, fed by the game's events |
-| `section`, `tag`, `toggle`, `combo`, `slider`, `slider_percent`, `button` | Page widgets |
+| `section`, `tag`, `toggle`, `combo`, `slider`, `slider_percent`, `button`, `inline_button`, `note` | Page widgets |
+| `reorder_list`, `ListRow`, `ListEdit`, `ListOptions` | Reorderable list (mods, packs) |
 | `pick_button`, `icon_button`, `confirm` | Building blocks of the shell, usable on their own |
 | `BindingTable`, `binding_table` | Input rebinding table with capture |
 | `About`, `Credit`, `Logo`, `TextureCallbacks`, `about_page` | About page and developer logo |
@@ -216,7 +221,8 @@ Everything is in `formae/ui.h`, namespace `formae::ui`; the version is in `forma
 
 `examples/demo` is a complete integration for a made-up game on SDL2. Its `--selftest <dir>` mode
 draws every page off screen in a hidden window and writes a PNG of each, so the library can be
-checked without opening a visible window; `tests/smoke.cpp` exercises every component headless.
+checked without opening a visible window; `tests/smoke.cpp` exercises every component headless and
+`tests/list.cpp` drives the reorderable list with keyboard, gamepad and mouse input.
 
 ```powershell
 git clone --recurse-submodules https://gitlab.com/formae/formae-ui.git

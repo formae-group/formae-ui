@@ -1,8 +1,8 @@
 // smoke.cpp - formae_ui_smoke: a headless check of the library with no
 // window and no renderer backend. It builds the fonts, draws every
-// component for a few frames (menu, widgets, binding table and capture,
-// confirmation, About page with a logo, first-run screen) and runs the
-// close and capture rules, failing on the first broken expectation. It also
+// component for a few frames (menu, widgets, reorderable lists, binding
+// table and capture, confirmation, About page with a logo, first-run
+// screen) and runs the close and capture rules, failing on the first broken expectation. It also
 // links an embedded file (formae_ui_embed_file) and reads the version header.
 #include "formae/ui.h"
 #include "smoke_png.h"
@@ -85,6 +85,12 @@ int main()
     int level = 50, choice = 1;
     bool flag = true;
     static const char *const names[] = { "One", "Two", "Three" };
+    std::vector<ui::ListRow> list = { { "a", "Alpha", "1.0", "", true }, { "b", "Beta", "", "Error", true } };
+    std::vector<ui::ListRow> empty;
+    ui::ListOptions list_options;
+    list_options.visible_rows = 1.5f;
+    list_options.header = "Header";
+    list_options.empty = "Empty";
     ui::Menu *menu_ref = nullptr;
     ui::Menu menu({ { "Settings",
                       { { "Widgets",
@@ -95,6 +101,10 @@ int main()
                               ui::combo("Choice", &choice, names, 3);
                               ui::toggle("Flag", &flag);
                               ui::button("Button");
+                              ui::inline_button("Inline");
+                              ui::note("Note", ui::Status::error);
+                              ui::reorder_list("##list", list, list_options);
+                              ui::reorder_list("##empty", empty, list_options);
                           } },
                         { "Controls", [&] { ui::binding_table(*menu_ref, bindings); } } } },
                     { "About", {}, [&] { ui::about_page(about); } } },

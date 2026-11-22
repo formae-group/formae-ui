@@ -13,7 +13,7 @@
 //   ImGui::Render();
 //
 // Pages are callbacks that call the widgets below (section, toggle, combo,
-// slider, button, binding_table, about_page). Sizes are measured in the
+// slider, button, note, reorder_list, binding_table, about_page). Sizes are measured in the
 // base size (Fonts::base); colours come from the Theme, whose defaults are
 // DuckTales Recompiled's look. See docs/widgets.md for every component.
 #pragma once
@@ -56,7 +56,7 @@ struct Theme {
     ImU32 scrollbar = IM_COL32(255, 255, 255, 40);        // scrollbar grab
     ImU32 scrollbar_hovered = IM_COL32(255, 255, 255, 64);
     ImU32 scrollbar_active = IM_COL32(255, 255, 255, 90);
-    ImU32 row_alt = IM_COL32(255, 255, 255, 7);           // alternate table rows (credits)
+    ImU32 row_alt = IM_COL32(255, 255, 255, 7);           // alternate table rows (credits, reorderable lists)
     ImU32 modal_dim = IM_COL32(0, 0, 0, 120);             // behind a confirmation
     int header_alpha = 64;                                // alpha of the accent behind a selected combo entry
     int selection_alpha = 90;                             // alpha of the accent behind selected text
@@ -158,6 +158,54 @@ bool icon_button(const char *id, Icon icon, float size, bool danger = false);
 // A centred modal question with a confirming button and Cancel (also Escape
 // and B). Opens when *ask is set, which it clears. Returns true when confirmed.
 bool confirm(const char *id, bool *ask, const char *question, const char *yes, const char *cancel = "Cancel");
+
+// The colour of a status line: none (dimmed), ok or error. Used by note()
+// and the first-run screen.
+enum class Status { none, ok, error };
+
+// A row of a reorderable list (a mod, a pack): checkbox, name, details.
+struct ListRow {
+    std::string id;       // stable identity: the row's ImGui id and what the game saves
+    std::string name;     // main text
+    std::string detail;   // dimmed text after the name on the same line ("1.2.0 - Author")
+    std::string error;    // non-empty: a second line in the theme's error colour; the checkbox is disabled and drawn off
+    bool enabled = true;  // the checkbox
+};
+
+// What the player did to a reorderable list in this frame.
+struct ListEdit {
+    enum Kind { none, toggled, moved };
+    Kind kind = none;
+    int row = -1;   // toggled: the row; moved: its index before the move
+    int to = -1;    // moved: its index after the move
+};
+
+// How a reorderable list draws.
+struct ListOptions {
+    float visible_rows = 0.0f;     // height of the scrolling region in rows; 0 = tall enough for every row, no scrolling
+    bool checkboxes = true;        // draw the enable checkbox
+    bool drag = true;              // the mouse can drag a row to a new place
+    const char *empty = nullptr;   // dimmed text shown when there are no rows
+    const char *header = nullptr;  // dimmed caption above the rows ("Enabled mods"), null = none
+};
+
+// A list whose rows the player reorders with the up and down buttons of each
+// row, the keyboard, the gamepad or (optionally) the mouse, and switches with
+// a checkbox. Moves and toggles are applied to rows in place; the return value
+// says which one happened (at most one per frame).
+//
+// Ctrl or Alt with Up or Down moves the row holding the keyboard focus. A, Enter
+// or Space on a row's name picks it up: Up and Down (arrows, D-pad, left stick)
+// then move it, and A, Enter, Space, B or Escape put it down. A picked-up row is
+// ImGui's active item, so Menu::busy() is true and Escape and B stay with ImGui.
+ListEdit reorder_list(const char *id, std::vector<ListRow> &rows, const ListOptions &options = ListOptions());
+
+// A paragraph wrapped to the page width in the dimmed text colour, or in the
+// ok or error colour for Status::ok / Status::error.
+void note(const char *text, Status status = Status::none);
+
+// A button as wide as its label (button() is full width), so several can share a line with ImGui::SameLine().
+bool inline_button(const char *label);
 
 // The device a binding column captures from.
 enum class Device { keyboard, gamepad };
@@ -338,9 +386,6 @@ struct About {
 // Draws the About page: identity and credits side by side, or stacked when
 // the page is narrower than 40 base sizes.
 void about_page(const About &about);
-
-// The first-run screen's status line.
-enum class Status { none, ok, error };
 
 // The first-run screen's texts and state, all from the game.
 struct FirstRunContent {
