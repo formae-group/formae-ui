@@ -14,7 +14,7 @@ add_library(imgui STATIC "${_imgui}/imgui.cpp" "${_imgui}/imgui_draw.cpp" "${_im
 target_include_directories(imgui PUBLIC "${_imgui}")
 target_compile_definitions(imgui PUBLIC IMGUI_DISABLE_OBSOLETE_FUNCTIONS)
 
-find_package(formae-ui 0.1 CONFIG REQUIRED)
+find_package(formae-ui 0.2 CONFIG REQUIRED)
 
 add_executable(formae_ui_package_smoke "${CMAKE_CURRENT_LIST_DIR}/../smoke.cpp")
 target_link_libraries(formae_ui_package_smoke PRIVATE formae::ui)

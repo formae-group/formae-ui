@@ -6,6 +6,8 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-22
+
 ### Added
 
 - `reorder_list` with `ListRow`, `ListEdit` and `ListOptions`: rows in priority order (mods,
@@ -52,5 +54,6 @@ All notable changes to formae-ui are recorded here. The format follows
 - SDL2 example with an off-screen self-test, a headless smoke test, a package consumer test and a
   GitLab CI pipeline on Windows.
 
-[Unreleased]: https://gitlab.com/formae/formae-ui/-/compare/v0.1.0...main
+[Unreleased]: https://gitlab.com/formae/formae-ui/-/compare/v0.2.0...main
+[0.2.0]: https://gitlab.com/formae/formae-ui/-/compare/v0.1.0...v0.2.0
 [0.1.0]: https://gitlab.com/formae/formae-ui/-/tags/v0.1.0

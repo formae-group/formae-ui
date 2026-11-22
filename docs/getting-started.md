@@ -8,7 +8,7 @@ This page takes a game from nothing to a working menu. The complete code is in
 
 ```powershell
 git submodule add https://gitlab.com/formae/formae-ui.git external/formae-ui
-git -C external/formae-ui checkout v0.1.0
+git -C external/formae-ui checkout v0.2.0
 ```
 
 formae-ui links your Dear ImGui target (default name `imgui`). Define it once, with the ImGui
