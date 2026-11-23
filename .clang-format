@@ -1,33 +1,57 @@
-# The repository's C++ layout (CONTRIBUTING.md "Style"): four-space indent,
-# attached braces except for functions, short single-line statements kept.
+# Source layout for C++ (CONTRIBUTING.md "Style"). Apply with
+# py -3 tools/format.py; never by hand.
 BasedOnStyle: LLVM
 Language: Cpp
 Standard: c++17
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
-ColumnLimit: 130
+ColumnLimit: 120
 LineEnding: CRLF
+InsertNewlineAtEOF: true
 BreakBeforeBraces: Custom
 BraceWrapping:
   AfterFunction: true
   AfterClass: false
   AfterStruct: false
+  AfterUnion: false
+  AfterEnum: false
   AfterNamespace: false
   AfterControlStatement: Never
+  AfterCaseLabel: false
   BeforeElse: false
-AccessModifierOffset: -4
-IndentCaseLabels: false
-NamespaceIndentation: None
-FixNamespaceComments: false
+  BeforeCatch: false
+  SplitEmptyFunction: true
+InsertBraces: true
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+AllowShortEnumsOnASingleLine: false
+AllowShortLambdasOnASingleLine: Empty
+BinPackArguments: true
+BinPackParameters: true
+AlignAfterOpenBracket: Align
+AlignConsecutiveMacros: Consecutive
+AlignTrailingComments: true
+AlignEscapedNewlines: Left
+SeparateDefinitionBlocks: Always
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+IndentCaseLabels: true
+IndentPPDirectives: None
 PointerAlignment: Right
 DerivePointerAlignment: false
-AllowShortIfStatementsOnASingleLine: WithoutElse
-AllowShortLoopsOnASingleLine: true
-AllowShortFunctionsOnASingleLine: Inline
-AllowShortLambdasOnASingleLine: All
-AllowShortBlocksOnASingleLine: Never
-AlignAfterOpenBracket: Align
+SpaceAfterCStyleCast: false
 Cpp11BracedListStyle: false
+AccessModifierOffset: -4
+NamespaceIndentation: None
+FixNamespaceComments: true
 SortIncludes: Never
+IncludeBlocks: Preserve
 ReflowComments: false
+AlwaysBreakAfterReturnType: None
+PenaltyReturnTypeOnItsOwnLine: 1000
+PenaltyBreakAssignment: 100
+AlignArrayOfStructures: None

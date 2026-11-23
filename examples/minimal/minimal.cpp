@@ -26,8 +26,16 @@ int main()
         ImGui_ImplSDLRenderer2_Init(renderer);
 
         ui::Menu menu({ { "Settings",
-                          { { "Audio", [] { ui::section("Volume"); ui::slider_percent("Master volume", &volume, 0, 100, 5); } },
-                            { "Video", [] { ui::section("Display"); ui::toggle("VSync", &vsync); } } } } },
+                          { { "Audio",
+                              [] {
+                                  ui::section("Volume");
+                                  ui::slider_percent("Master volume", &volume, 0, 100, 5);
+                              } },
+                            { "Video",
+                              [] {
+                                  ui::section("Display");
+                                  ui::toggle("VSync", &vsync);
+                              } } } } },
                       { { "##resume", ui::Icon::resume } });
 
         bool open = true;
@@ -39,17 +47,24 @@ int main()
                     input.type = ui::InputEvent::key_down;
                     input.cancel = event.key.keysym.scancode == SDL_SCANCODE_ESCAPE;
                 }
-                if (event.type == SDL_QUIT || menu.event(input) == ui::EventResult::close) open = false;
-                else ImGui_ImplSDL2_ProcessEvent(&event);
+                if (event.type == SDL_QUIT || menu.event(input) == ui::EventResult::close) {
+                    open = false;
+                } else {
+                    ImGui_ImplSDL2_ProcessEvent(&event);
+                }
             }
             int width = 0, height = 0;
             SDL_GetRendererOutputSize(renderer, &width, &height);
-            if (context.fit(ui::base_size(height, 96.0f))) ImGui_ImplSDLRenderer2_DestroyFontsTexture();
+            if (context.fit(ui::base_size(height, 96.0f))) {
+                ImGui_ImplSDLRenderer2_DestroyFontsTexture();
+            }
 
             ImGui_ImplSDLRenderer2_NewFrame();
             ImGui_ImplSDL2_NewFrame();
             ImGui::NewFrame();
-            if (menu.draw(80) == 0) open = false;
+            if (menu.draw(80) == 0) {
+                open = false;
+            }
             ImGui::Render();
             SDL_RenderClear(renderer);
             ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);

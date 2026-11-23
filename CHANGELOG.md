@@ -6,6 +6,11 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- One code layout for every C++ and Python source: `.clang-format` (4 spaces, 120 columns, braces
+  always, no one-line statements) and Black, applied by `tools/format.py` (`--check` to verify).
+
 ## [0.2.0] - 2026-11-22
 
 ### Added

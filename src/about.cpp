@@ -34,7 +34,9 @@ Logo::Logo(const unsigned char *png, size_t size, TextureCallbacks textures) : t
     alpha_.resize((size_t)sw_ * (size_t)sh_);
     for (size_t i = 0; i < alpha_.size(); i++) {
         alpha_[i] = px[i * 4 + 3];
-        if (alpha_[i] == 255) rgb_ = (uint32_t)px[i * 4] << 16 | (uint32_t)px[i * 4 + 1] << 8 | px[i * 4 + 2];
+        if (alpha_[i] == 255) {
+            rgb_ = (uint32_t)px[i * 4] << 16 | (uint32_t)px[i * 4 + 1] << 8 | px[i * 4 + 2];
+        }
     }
     stbi_image_free(px);
 }
@@ -46,9 +48,15 @@ Logo::~Logo()
 
 ImTextureID Logo::at(int height)
 {
-    if (!sw_ || height <= 0 || !textures_.create) return 0;
-    if (height > sh_) height = sh_;
-    if (tex_ && height == h_) return tex_;
+    if (!sw_ || height <= 0 || !textures_.create) {
+        return 0;
+    }
+    if (height > sh_) {
+        height = sh_;
+    }
+    if (tex_ && height == h_) {
+        return tex_;
+    }
     release();
     h_ = height;
     w_ = (int)std::lround((double)sw_ * h_ / sh_);
@@ -58,8 +66,11 @@ ImTextureID Logo::at(int height)
         for (int x = 0; x < w_; x++) {
             const int x0 = x * sw_ / w_, x1 = (x + 1) * sw_ / w_ > x0 ? (x + 1) * sw_ / w_ : x0 + 1;
             unsigned sum = 0;
-            for (int sy = y0; sy < y1; sy++)
-                for (int sx = x0; sx < x1; sx++) sum += alpha_[(size_t)sy * sw_ + sx];
+            for (int sy = y0; sy < y1; sy++) {
+                for (int sx = x0; sx < x1; sx++) {
+                    sum += alpha_[(size_t)sy * sw_ + sx];
+                }
+            }
             const unsigned a = sum / (unsigned)((y1 - y0) * (x1 - x0));
             out[(size_t)y * w_ + x] = a << 24 | rgb_;
         }
@@ -70,7 +81,9 @@ ImTextureID Logo::at(int height)
 
 void Logo::release()
 {
-    if (tex_ && textures_.destroy) textures_.destroy(textures_.user, tex_);
+    if (tex_ && textures_.destroy) {
+        textures_.destroy(textures_.user, tex_);
+    }
     tex_ = 0;
 }
 
@@ -82,10 +95,16 @@ void identity(const About &a, const Fonts &F, const Theme &t)
     ImGui::TextUnformatted(a.title ? a.title : "");
     ImGui::PopFont();
     ImGui::PushStyleColor(ImGuiCol_Text, t.text_dim);
-    if (a.version) ImGui::Text("%s %s", a.version_label, a.version);
-    if (a.build_date) ImGui::Text("%s %s", a.built_label, a.build_date);
+    if (a.version) {
+        ImGui::Text("%s %s", a.version_label, a.version);
+    }
+    if (a.build_date) {
+        ImGui::Text("%s %s", a.built_label, a.build_date);
+    }
     ImGui::PopStyleColor();
-    if (!a.developer && !a.logo) return;
+    if (!a.developer && !a.logo) {
+        return;
+    }
     ImGui::Dummy(ImVec2(0, std::floor(F.base * 0.6f)));
     if (a.developer) {
         ImGui::PushFont(F.strong);
@@ -93,9 +112,12 @@ void identity(const About &a, const Fonts &F, const Theme &t)
         ImGui::PopFont();
     }
     ImGui::Dummy(ImVec2(0, std::floor(F.base * 0.3f)));
-    if (!a.logo) return;
-    if (ImTextureID tex = a.logo->at((int)std::floor(F.base * 6.5f)))
+    if (!a.logo) {
+        return;
+    }
+    if (ImTextureID tex = a.logo->at((int)std::floor(F.base * 6.5f))) {
         ImGui::Image(tex, ImVec2((float)a.logo->width(), (float)a.logo->height()));
+    }
 }
 
 void credits(const About &a, const Fonts &F, const Theme &t)
@@ -120,14 +142,16 @@ void credits(const About &a, const Fonts &F, const Theme &t)
         }
         ImGui::EndTable();
     }
-    if (!a.disclaimer) return;
+    if (!a.disclaimer) {
+        return;
+    }
     ImGui::Dummy(ImVec2(0, std::floor(F.base * 0.5f)));
     ImGui::PushStyleColor(ImGuiCol_Text, t.text_dim);
     ImGui::TextWrapped("%s", a.disclaimer);
     ImGui::PopStyleColor();
 }
 
-}
+} // namespace
 
 void about_page(const About &about)
 {
@@ -140,9 +164,12 @@ void about_page(const About &about)
         return;
     }
     ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(std::floor(F.base * 1.2f), 0));
-    const bool table = ImGui::BeginTable("##about", 2, ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerV);
+    const bool table = ImGui::BeginTable("##about", 2,
+                                         ImGuiTableFlags_SizingStretchProp | ImGuiTableFlags_BordersInnerV);
     ImGui::PopStyleVar();
-    if (!table) return;
+    if (!table) {
+        return;
+    }
     ImGui::TableSetupColumn("##identity", ImGuiTableColumnFlags_WidthStretch, 0.8f);
     ImGui::TableSetupColumn("##credits", ImGuiTableColumnFlags_WidthStretch, 1.2f);
     ImGui::TableNextRow();
@@ -153,4 +180,4 @@ void about_page(const About &about)
     ImGui::EndTable();
 }
 
-}
+} // namespace formae::ui

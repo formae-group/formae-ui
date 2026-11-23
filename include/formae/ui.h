@@ -32,34 +32,34 @@ namespace formae::ui {
 // Every colour the library draws with, as ImGui IM_COL32 values. Override
 // fields before passing a Theme to Context; the defaults are the reference look.
 struct Theme {
-    ImU32 accent = IM_COL32(242, 179, 61, 255);           // chosen tab and category, rules, checks, slider grab
-    ImU32 accent_hi = IM_COL32(252, 200, 102, 255);       // accent while hovered or held
-    ImU32 on_accent = IM_COL32(26, 19, 6, 255);           // text on accent fills
-    ImU32 backdrop = IM_COL32(11, 13, 18, 255);           // behind the menu (its alpha comes from the opacity)
-    ImU32 text = IM_COL32(236, 239, 243, 255);            // body text
-    ImU32 text_dim = IM_COL32(150, 158, 171, 255);        // section titles, secondary text
-    ImU32 text_off = IM_COL32(98, 105, 118, 255);         // disabled text, unbound bindings, footers
-    ImU32 line = IM_COL32(255, 255, 255, 34);             // separators and borders
-    ImU32 soft_hover = IM_COL32(255, 255, 255, 22);       // unchosen tab or category under the pointer
-    ImU32 soft_active = IM_COL32(255, 255, 255, 40);      // unchosen tab or category while held
-    ImU32 danger = IM_COL32(172, 56, 50, 255);            // destructive bar button (Quit)
-    ImU32 danger_hi = IM_COL32(204, 74, 66, 255);         // destructive button hovered or held
-    ImU32 error_text = IM_COL32(239, 112, 100, 255);      // refusals and errors
-    ImU32 ok_text = IM_COL32(126, 205, 140, 255);         // success messages
-    ImU32 popup = IM_COL32(24, 28, 36, 252);              // combo lists and dialogs
-    ImU32 frame = IM_COL32(40, 46, 58, 255);              // slider, combo and checkbox frames
-    ImU32 frame_hovered = IM_COL32(54, 62, 77, 255);      // frame under the pointer
-    ImU32 frame_active = IM_COL32(66, 76, 94, 255);       // frame while held
-    ImU32 button = IM_COL32(44, 51, 64, 255);             // buttons
-    ImU32 button_hovered = IM_COL32(60, 70, 87, 255);     // button under the pointer
-    ImU32 button_active = IM_COL32(76, 88, 108, 255);     // button while held
-    ImU32 scrollbar = IM_COL32(255, 255, 255, 40);        // scrollbar grab
+    ImU32 accent = IM_COL32(242, 179, 61, 255);       // chosen tab and category, rules, checks, slider grab
+    ImU32 accent_hi = IM_COL32(252, 200, 102, 255);   // accent while hovered or held
+    ImU32 on_accent = IM_COL32(26, 19, 6, 255);       // text on accent fills
+    ImU32 backdrop = IM_COL32(11, 13, 18, 255);       // behind the menu (its alpha comes from the opacity)
+    ImU32 text = IM_COL32(236, 239, 243, 255);        // body text
+    ImU32 text_dim = IM_COL32(150, 158, 171, 255);    // section titles, secondary text
+    ImU32 text_off = IM_COL32(98, 105, 118, 255);     // disabled text, unbound bindings, footers
+    ImU32 line = IM_COL32(255, 255, 255, 34);         // separators and borders
+    ImU32 soft_hover = IM_COL32(255, 255, 255, 22);   // unchosen tab or category under the pointer
+    ImU32 soft_active = IM_COL32(255, 255, 255, 40);  // unchosen tab or category while held
+    ImU32 danger = IM_COL32(172, 56, 50, 255);        // destructive bar button (Quit)
+    ImU32 danger_hi = IM_COL32(204, 74, 66, 255);     // destructive button hovered or held
+    ImU32 error_text = IM_COL32(239, 112, 100, 255);  // refusals and errors
+    ImU32 ok_text = IM_COL32(126, 205, 140, 255);     // success messages
+    ImU32 popup = IM_COL32(24, 28, 36, 252);          // combo lists and dialogs
+    ImU32 frame = IM_COL32(40, 46, 58, 255);          // slider, combo and checkbox frames
+    ImU32 frame_hovered = IM_COL32(54, 62, 77, 255);  // frame under the pointer
+    ImU32 frame_active = IM_COL32(66, 76, 94, 255);   // frame while held
+    ImU32 button = IM_COL32(44, 51, 64, 255);         // buttons
+    ImU32 button_hovered = IM_COL32(60, 70, 87, 255); // button under the pointer
+    ImU32 button_active = IM_COL32(76, 88, 108, 255); // button while held
+    ImU32 scrollbar = IM_COL32(255, 255, 255, 40);    // scrollbar grab
     ImU32 scrollbar_hovered = IM_COL32(255, 255, 255, 64);
     ImU32 scrollbar_active = IM_COL32(255, 255, 255, 90);
-    ImU32 row_alt = IM_COL32(255, 255, 255, 7);           // alternate table rows (credits, reorderable lists)
-    ImU32 modal_dim = IM_COL32(0, 0, 0, 120);             // behind a confirmation
-    int header_alpha = 64;                                // alpha of the accent behind a selected combo entry
-    int selection_alpha = 90;                             // alpha of the accent behind selected text
+    ImU32 row_alt = IM_COL32(255, 255, 255, 7); // alternate table rows (credits, reorderable lists)
+    ImU32 modal_dim = IM_COL32(0, 0, 0, 120);   // behind a confirmation
+    int header_alpha = 64;                      // alpha of the accent behind a selected combo entry
+    int selection_alpha = 90;                   // alpha of the accent behind selected text
 };
 
 // The TrueType files Context loads: a regular face and a heavier one for
@@ -71,12 +71,13 @@ struct FontFiles {
 
 // The fonts built for the current base size.
 struct Fonts {
-    ImFont *body = nullptr;     // base size, regular
-    ImFont *strong = nullptr;   // base size, semibold (tabs, buttons, emphasis)
-    ImFont *small = nullptr;    // 0.82 of the base size (details, footers)
-    ImFont *title = nullptr;    // 1.9 of the base size, semibold (page titles)
-    float base = 0.0f;          // the base size in pixels
-    bool system = false;        // the system font loaded; false: ImGui's fallback font without the minus, times and ellipsis glyphs
+    ImFont *body = nullptr;   // base size, regular
+    ImFont *strong = nullptr; // base size, semibold (tabs, buttons, emphasis)
+    ImFont *small = nullptr;  // 0.82 of the base size (details, footers)
+    ImFont *title = nullptr;  // 1.9 of the base size, semibold (page titles)
+    float base = 0.0f;        // the base size in pixels
+    bool system =
+        false; // the system font loaded; false: ImGui's fallback font without the minus, times and ellipsis glyphs
 };
 
 // The platform's UI font: Segoe UI and Segoe UI Semibold on Windows.
@@ -107,11 +108,22 @@ public:
     void set_gamepad_navigation(bool on);
 
     // The ImGui context this owns.
-    ImGuiContext *imgui() const { return imgui_; }
+    ImGuiContext *imgui() const
+    {
+        return imgui_;
+    }
+
     // The theme in use.
-    const Theme &theme() const { return theme_; }
+    const Theme &theme() const
+    {
+        return theme_;
+    }
+
     // The fonts for the last fit.
-    const Fonts &fonts() const { return fonts_; }
+    const Fonts &fonts() const
+    {
+        return fonts_;
+    }
 
 private:
     ImGuiContext *imgui_ = nullptr;
@@ -150,7 +162,11 @@ bool button(const char *label);
 bool pick_button(const char *label, bool chosen, ImVec2 size);
 
 // The icons the bar's square buttons draw.
-enum class Icon { reset, quit, resume };
+enum class Icon {
+    reset,
+    quit,
+    resume
+};
 
 // A square button of the given size with an icon drawn in the text colour;
 // danger uses the theme's danger colours. Returns true when pressed.
@@ -161,32 +177,41 @@ bool confirm(const char *id, bool *ask, const char *question, const char *yes, c
 
 // The colour of a status line: none (dimmed), ok or error. Used by note()
 // and the first-run screen.
-enum class Status { none, ok, error };
+enum class Status {
+    none,
+    ok,
+    error
+};
 
 // A row of a reorderable list (a mod, a pack): checkbox, name, details.
 struct ListRow {
-    std::string id;       // stable identity: the row's ImGui id and what the game saves
-    std::string name;     // main text
-    std::string detail;   // dimmed text after the name on the same line ("1.2.0 - Author")
-    std::string error;    // non-empty: a second line in the theme's error colour; the checkbox is disabled and drawn off
-    bool enabled = true;  // the checkbox
+    std::string id;      // stable identity: the row's ImGui id and what the game saves
+    std::string name;    // main text
+    std::string detail;  // dimmed text after the name on the same line ("1.2.0 - Author")
+    std::string error;   // non-empty: a second line in the theme's error colour; the checkbox is disabled and drawn off
+    bool enabled = true; // the checkbox
 };
 
 // What the player did to a reorderable list in this frame.
 struct ListEdit {
-    enum Kind { none, toggled, moved };
+    enum Kind {
+        none,
+        toggled,
+        moved
+    };
+
     Kind kind = none;
-    int row = -1;   // toggled: the row; moved: its index before the move
-    int to = -1;    // moved: its index after the move
+    int row = -1; // toggled: the row; moved: its index before the move
+    int to = -1;  // moved: its index after the move
 };
 
 // How a reorderable list draws.
 struct ListOptions {
-    float visible_rows = 0.0f;     // height of the scrolling region in rows; 0 = tall enough for every row, no scrolling
-    bool checkboxes = true;        // draw the enable checkbox
-    bool drag = true;              // the mouse can drag a row to a new place
-    const char *empty = nullptr;   // dimmed text shown when there are no rows
-    const char *header = nullptr;  // dimmed caption above the rows ("Enabled mods"), null = none
+    float visible_rows = 0.0f;    // height of the scrolling region in rows; 0 = tall enough for every row, no scrolling
+    bool checkboxes = true;       // draw the enable checkbox
+    bool drag = true;             // the mouse can drag a row to a new place
+    const char *empty = nullptr;  // dimmed text shown when there are no rows
+    const char *header = nullptr; // dimmed caption above the rows ("Enabled mods"), null = none
 };
 
 // A list whose rows the player reorders with the up and down buttons of each
@@ -208,31 +233,47 @@ void note(const char *text, Status status = Status::none);
 bool inline_button(const char *label);
 
 // The device a binding column captures from.
-enum class Device { keyboard, gamepad };
+enum class Device {
+    keyboard,
+    gamepad
+};
 
 // An input event translated by the game from its platform's event. code is
 // the game's own number (key scancode, button or axis index); the flags say
 // what the event means to the menu.
 struct InputEvent {
-    enum Type { other, key_down, key_up, button_down, button_up, axis, mouse_down };
+    enum Type {
+        other,
+        key_down,
+        key_up,
+        button_down,
+        button_up,
+        axis,
+        mouse_down
+    };
+
     Type type = other;
-    int code = 0;          // key, button or axis
-    int value = 0;         // axis position, -32768..32767
-    bool repeat = false;   // a key's auto-repeat
-    bool cancel = false;   // Escape
-    bool clear = false;    // Delete or Backspace
-    bool back = false;     // the gamepad's back face button (B)
-    bool menu = false;     // the game's menu shortcut (key or button)
+    int code = 0;        // key, button or axis
+    int value = 0;       // axis position, -32768..32767
+    bool repeat = false; // a key's auto-repeat
+    bool cancel = false; // Escape
+    bool clear = false;  // Delete or Backspace
+    bool back = false;   // the gamepad's back face button (B)
+    bool menu = false;   // the game's menu shortcut (key or button)
 };
 
 // What Menu::event did with an event: pass it to ImGui, drop it, or close the menu.
-enum class EventResult { pass, swallow, close };
+enum class EventResult {
+    pass,
+    swallow,
+    close
+};
 
 // One device column of a binding table.
 struct BindingColumn {
-    const char *title;    // header, "Keyboard"
-    Device device;        // what a capture in this column accepts
-    const char *prompt;   // shown in the cell while capturing, "Press a key"
+    const char *title;  // header, "Keyboard"
+    Device device;      // what a capture in this column accepts
+    const char *prompt; // shown in the cell while capturing, "Press a key"
 };
 
 // Rows of actions by device columns, all names and values from the game.
@@ -265,11 +306,11 @@ struct Tab {
 
 // A square button at the bar's right. With a question it asks first.
 struct BarButton {
-    const char *id;                   // ImGui id, "##quit"; its confirmation is id + "-confirm"
+    const char *id; // ImGui id, "##quit"; its confirmation is id + "-confirm"
     Icon icon;
     bool danger = false;
-    const char *question = nullptr;   // "Quit the game?"
-    const char *confirm = nullptr;    // the confirming button's label, "Quit"
+    const char *question = nullptr; // "Quit the game?"
+    const char *confirm = nullptr;  // the confirming button's label, "Quit"
 };
 
 // The menu shell: tabs, bar buttons, sidebar, page, confirmations, the
@@ -298,13 +339,28 @@ public:
     void notice(const char *text);
 
     // The chosen tab.
-    int tab() const { return tab_; }
+    int tab() const
+    {
+        return tab_;
+    }
+
     // The chosen tab's chosen category.
-    int category() const { return category_[tab_]; }
+    int category() const
+    {
+        return category_[tab_];
+    }
+
     // A popup was open or an item active at the last draw (Escape and B are ImGui's).
-    bool busy() const { return busy_; }
+    bool busy() const
+    {
+        return busy_;
+    }
+
     // A binding is being captured.
-    bool capturing() const { return capture_row_ >= 0; }
+    bool capturing() const
+    {
+        return capture_row_ >= 0;
+    }
 
 private:
     friend void binding_table(Menu &menu, const BindingTable &table);
@@ -349,9 +405,17 @@ public:
     ImTextureID at(int height);
     // Destroys the texture; call before the renderer goes away.
     void release();
+
     // The size of the last texture.
-    int width() const { return w_; }
-    int height() const { return h_; }
+    int width() const
+    {
+        return w_;
+    }
+
+    int height() const
+    {
+        return h_;
+    }
 
 private:
     TextureCallbacks textures_;
@@ -371,13 +435,13 @@ struct Credit {
 
 // The About page's content; null fields are left out.
 struct About {
-    const char *title = nullptr;        // the game's name
-    const char *version = nullptr;      // shown as "<version_label> <version>"
-    const char *build_date = nullptr;   // shown as "<built_label> <build_date>"
-    const char *developer = nullptr;    // "Developed by Formae"
-    Logo *logo = nullptr;               // under the developer
+    const char *title = nullptr;      // the game's name
+    const char *version = nullptr;    // shown as "<version_label> <version>"
+    const char *build_date = nullptr; // shown as "<built_label> <build_date>"
+    const char *developer = nullptr;  // "Developed by Formae"
+    Logo *logo = nullptr;             // under the developer
     std::vector<Credit> credits;
-    const char *disclaimer = nullptr;   // under the credits
+    const char *disclaimer = nullptr; // under the credits
     const char *version_label = "Version";
     const char *built_label = "Built";
     const char *credits_title = "Credits";
@@ -389,20 +453,24 @@ void about_page(const About &about);
 
 // The first-run screen's texts and state, all from the game.
 struct FirstRunContent {
-    const char *app_title = nullptr;     // in the top bar
-    const char *title = nullptr;         // "Choose your ROM"
-    const char *text = nullptr;          // the explanation under it
-    const char *primary = nullptr;       // the accent button
-    const char *secondary = nullptr;     // the other button ("Quit")
-    bool busy = false;                   // buttons disabled
+    const char *app_title = nullptr; // in the top bar
+    const char *title = nullptr;     // "Choose your ROM"
+    const char *text = nullptr;      // the explanation under it
+    const char *primary = nullptr;   // the accent button
+    const char *secondary = nullptr; // the other button ("Quit")
+    bool busy = false;               // buttons disabled
     Status status = Status::none;
-    const char *status_text = nullptr;   // success or error line
-    const char *detail = nullptr;        // smaller text under an error
-    const char *footer = nullptr;        // at the bottom of the column
+    const char *status_text = nullptr; // success or error line
+    const char *detail = nullptr;      // smaller text under an error
+    const char *footer = nullptr;      // at the bottom of the column
 };
 
 // What the player did on the first-run screen this frame.
-enum class FirstRunAction { none, primary, secondary };
+enum class FirstRunAction {
+    none,
+    primary,
+    secondary
+};
 
 // The first-run screen; keep one for the screen's lifetime.
 class FirstRunScreen {
@@ -414,4 +482,4 @@ private:
     bool first_frame_ = true;
 };
 
-}
+} // namespace formae::ui

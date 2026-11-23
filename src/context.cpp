@@ -22,7 +22,9 @@ Context *active = nullptr;
 bool file_exists(const std::string &path)
 {
     FILE *f = std::fopen(path.c_str(), "rb");
-    if (f) std::fclose(f);
+    if (f) {
+        std::fclose(f);
+    }
     return f != nullptr;
 }
 
@@ -93,7 +95,9 @@ void apply_style(float b, const Theme &t)
     s.SeparatorTextAlign = ImVec2(0.0f, 0.5f);
     s.DisabledAlpha = 0.45f;
     ImVec4 *c = s.Colors;
-    auto col = [](ImU32 u) { return ImGui::ColorConvertU32ToFloat4(u); };
+    auto col = [](ImU32 u) {
+        return ImGui::ColorConvertU32ToFloat4(u);
+    };
     const ImU32 clear = IM_COL32(0, 0, 0, 0);
     c[ImGuiCol_Text] = col(t.text);
     c[ImGuiCol_TextDisabled] = col(t.text_off);
@@ -124,7 +128,7 @@ void apply_style(float b, const Theme &t)
     c[ImGuiCol_ModalWindowDimBg] = col(t.modal_dim);
 }
 
-}
+} // namespace
 
 FontFiles system_font_files()
 {
@@ -145,10 +149,16 @@ FontFiles system_font_files()
 
 float base_size(int drawable_height, float dpi)
 {
-    if (dpi <= 0.0f) dpi = 96.0f;
+    if (dpi <= 0.0f) {
+        dpi = 96.0f;
+    }
     float b = drawable_height / 42.0f;
-    if (b < 15.0f * dpi / 96.0f) b = 15.0f * dpi / 96.0f;
-    if (b > drawable_height / 20.0f) b = drawable_height / 20.0f;
+    if (b < 15.0f * dpi / 96.0f) {
+        b = 15.0f * dpi / 96.0f;
+    }
+    if (b > drawable_height / 20.0f) {
+        b = drawable_height / 20.0f;
+    }
     return std::floor(b < 10.0f ? 10.0f : b);
 }
 
@@ -166,13 +176,19 @@ Context::Context(const Theme &theme, FontFiles files) : theme_(theme), files_(st
 
 Context::~Context()
 {
-    if (imgui_) ImGui::DestroyContext(imgui_);
-    if (active == this) active = nullptr;
+    if (imgui_) {
+        ImGui::DestroyContext(imgui_);
+    }
+    if (active == this) {
+        active = nullptr;
+    }
 }
 
 bool Context::fit(float base)
 {
-    if (base == fonts_.base) return false;
+    if (base == fonts_.base) {
+        return false;
+    }
     fonts_ = load_fonts(base, files_);
     apply_style(base, theme_);
     return true;
@@ -187,8 +203,11 @@ void Context::make_current()
 void Context::set_gamepad_navigation(bool on)
 {
     ImGuiIO &io = ImGui::GetIO();
-    if (on) io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-    else io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableGamepad;
+    if (on) {
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+    } else {
+        io.ConfigFlags &= ~ImGuiConfigFlags_NavEnableGamepad;
+    }
 }
 
 Context &current()
@@ -200,15 +219,20 @@ Context &current()
 std::string glyphs(const char *utf8)
 {
     std::string s = utf8 ? utf8 : "";
-    if (!active || active->fonts().system) return s;
+    if (!active || active->fonts().system) {
+        return s;
+    }
     static const char *const swaps[][2] = {
-        { "\xE2\x88\x92", "-" }, { "\xC3\x97", "x" }, { "\xE2\x80\xA6", "..." }, { "\xE2\x80\x93", "-" }, { "\xE2\x80\x94", "-" },
+        { "\xE2\x88\x92", "-" }, { "\xC3\x97", "x" },     { "\xE2\x80\xA6", "..." },
+        { "\xE2\x80\x93", "-" }, { "\xE2\x80\x94", "-" },
     };
     for (const auto &w : swaps) {
         const std::string from = w[0], to = w[1];
-        for (size_t at = s.find(from); at != std::string::npos; at = s.find(from, at + to.size())) s.replace(at, from.size(), to);
+        for (size_t at = s.find(from); at != std::string::npos; at = s.find(from, at + to.size())) {
+            s.replace(at, from.size(), to);
+        }
     }
     return s;
 }
 
-}
+} // namespace formae::ui

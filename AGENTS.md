@@ -26,12 +26,15 @@ loop, its settings and its texts.
 | Change | Command |
 |---|---|
 | Any | `cmake --build build --config Release --parallel` then `ctest --test-dir build -C Release --output-on-failure` |
+| Any source change | `py -3 tools/format.py --check` |
 | CMake, install, package config | the `tests/package` steps in CONTRIBUTING.md |
 | Anything visible | look at `build/examples/selftest/*.png` before and after |
 
 ## Conventions
 
 - C++17, four-space indent, CRLF line endings, UTF-8.
+- Layout is `.clang-format` (C++) and Black (Python, `pyproject.toml`): run `py -3 tools/format.py`
+  before committing; `py -3 tools/format.py --check` must list nothing.
 - Each file opens with a header comment naming its purpose. Public declarations get a short doc
   comment. No comments inside function bodies.
 - `snake_case` functions and variables, `PascalCase` types, `namespace formae::ui`.

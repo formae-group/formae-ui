@@ -31,7 +31,9 @@ void section(const char *title)
 
 void tag(const char *text)
 {
-    if (!text) return;
+    if (!text) {
+        return;
+    }
     ImGui::SameLine();
     ImGui::PushStyleColor(ImGuiCol_Text, current().theme().accent);
     ImGui::TextUnformatted(text);
@@ -61,7 +63,9 @@ bool combo(const char *label, int *value, const char *const *names, int count, c
                 *value = i;
                 changed = true;
             }
-            if (selected) ImGui::SetItemDefaultFocus();
+            if (selected) {
+                ImGui::SetItemDefaultFocus();
+            }
         }
         ImGui::EndCombo();
     }
@@ -78,16 +82,25 @@ bool slider(const char *label, int *value, int lo, int hi, int step, const char 
     const ImGuiStyle &s = ImGui::GetStyle();
     const float b = ImGui::GetFrameHeight(), w = ImGui::GetContentRegionAvail().x;
     ImGui::PushItemFlag(ImGuiItemFlags_ButtonRepeat, true);
-    if (ImGui::Button(glyphs("\xE2\x88\x92##dec").c_str(), ImVec2(b, b))) *value -= step;
+    if (ImGui::Button(glyphs("\xE2\x88\x92##dec").c_str(), ImVec2(b, b))) {
+        *value -= step;
+    }
     ImGui::SameLine(0, s.ItemInnerSpacing.x);
     ImGui::SetNextItemWidth(w - 2.0f * (b + s.ItemInnerSpacing.x));
-    ImGui::SliderInt("##value", value, lo, hi, glyphs(format).c_str(), ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
+    ImGui::SliderInt("##value", value, lo, hi, glyphs(format).c_str(),
+                     ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
     ImGui::SameLine(0, s.ItemInnerSpacing.x);
-    if (ImGui::Button("+##inc", ImVec2(b, b))) *value += step;
+    if (ImGui::Button("+##inc", ImVec2(b, b))) {
+        *value += step;
+    }
     ImGui::PopItemFlag();
     ImGui::PopID();
-    if (*value < lo) *value = lo;
-    if (*value > hi) *value = hi;
+    if (*value < lo) {
+        *value = lo;
+    }
+    if (*value > hi) {
+        *value = hi;
+    }
     return *value != was;
 }
 
@@ -109,7 +122,9 @@ bool inline_button(const char *label)
 void note(const char *text, Status status)
 {
     const Theme &t = current().theme();
-    ImGui::PushStyleColor(ImGuiCol_Text, status == Status::ok ? t.ok_text : status == Status::error ? t.error_text : t.text_dim);
+    ImGui::PushStyleColor(ImGuiCol_Text, status == Status::ok      ? t.ok_text
+                                         : status == Status::error ? t.error_text
+                                                                   : t.text_dim);
     ImGui::PushTextWrapPos(0.0f);
     ImGui::TextUnformatted(text);
     ImGui::PopTextWrapPos();
@@ -137,32 +152,35 @@ bool icon_button(const char *id, Icon icon, float size, bool danger)
         ImGui::PushStyleColor(ImGuiCol_ButtonActive, t.danger_hi);
     }
     const bool pressed = ImGui::Button(id, ImVec2(size, size));
-    if (danger) ImGui::PopStyleColor(3);
+    if (danger) {
+        ImGui::PopStyleColor(3);
+    }
     const ImVec2 a = ImGui::GetItemRectMin(), q = ImGui::GetItemRectMax();
     const ImVec2 c((a.x + q.x) * 0.5f, (a.y + q.y) * 0.5f);
     const float r = size * 0.24f, th = size * 0.075f < 1.5f ? 1.5f : size * 0.075f;
     const ImU32 col = ImGui::GetColorU32(ImGuiCol_Text);
     ImDrawList *dl = ImGui::GetWindowDrawList();
     switch (icon) {
-    case Icon::quit:
-        dl->PathArcTo(c, r, -PI * 0.5f + 0.75f, PI * 1.5f - 0.75f, 28);
-        dl->PathStroke(col, 0, th);
-        dl->AddLine(ImVec2(c.x, c.y - r * 1.3f), ImVec2(c.x, c.y - r * 0.2f), col, th);
-        break;
-    case Icon::reset: {
-        const float a0 = -PI * 0.5f, a1 = a0 + PI * 1.5f;
-        dl->PathArcTo(c, r, a0, a1, 28);
-        dl->PathStroke(col, 0, th);
-        const ImVec2 n(std::cos(a1), std::sin(a1)), d(-n.y, n.x), p(c.x + n.x * r, c.y + n.y * r);
-        const float h = r * 0.62f;
-        dl->AddTriangleFilled(ImVec2(p.x + d.x * h, p.y + d.y * h), ImVec2(p.x + n.x * h - d.x * h * 0.25f, p.y + n.y * h - d.y * h * 0.25f),
-                              ImVec2(p.x - n.x * h - d.x * h * 0.25f, p.y - n.y * h - d.y * h * 0.25f), col);
-        break;
-    }
-    case Icon::resume:
-        dl->AddTriangleFilled(ImVec2(c.x - r * 0.7f, c.y - r * 0.95f), ImVec2(c.x - r * 0.7f, c.y + r * 0.95f),
-                              ImVec2(c.x + r * 0.95f, c.y), col);
-        break;
+        case Icon::quit:
+            dl->PathArcTo(c, r, -PI * 0.5f + 0.75f, PI * 1.5f - 0.75f, 28);
+            dl->PathStroke(col, 0, th);
+            dl->AddLine(ImVec2(c.x, c.y - r * 1.3f), ImVec2(c.x, c.y - r * 0.2f), col, th);
+            break;
+        case Icon::reset: {
+            const float a0 = -PI * 0.5f, a1 = a0 + PI * 1.5f;
+            dl->PathArcTo(c, r, a0, a1, 28);
+            dl->PathStroke(col, 0, th);
+            const ImVec2 n(std::cos(a1), std::sin(a1)), d(-n.y, n.x), p(c.x + n.x * r, c.y + n.y * r);
+            const float h = r * 0.62f;
+            dl->AddTriangleFilled(ImVec2(p.x + d.x * h, p.y + d.y * h),
+                                  ImVec2(p.x + n.x * h - d.x * h * 0.25f, p.y + n.y * h - d.y * h * 0.25f),
+                                  ImVec2(p.x - n.x * h - d.x * h * 0.25f, p.y - n.y * h - d.y * h * 0.25f), col);
+            break;
+        }
+        case Icon::resume:
+            dl->AddTriangleFilled(ImVec2(c.x - r * 0.7f, c.y - r * 0.95f), ImVec2(c.x - r * 0.7f, c.y + r * 0.95f),
+                                  ImVec2(c.x + r * 0.95f, c.y), col);
+            break;
     }
     return pressed;
 }
@@ -176,9 +194,11 @@ bool confirm(const char *id, bool *ask, const char *question, const char *yes, c
     }
     const ImVec2 ds = ImGui::GetIO().DisplaySize;
     ImGui::SetNextWindowPos(ImVec2(ds.x * 0.5f, ds.y * 0.5f), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
-    if (!ImGui::BeginPopupModal(id, nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
-                                                 ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove))
+    if (!ImGui::BeginPopupModal(id, nullptr,
+                                ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
+                                    ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoMove)) {
         return false;
+    }
     bool confirmed = false;
     ImGui::PushFont(F.strong);
     ImGui::TextUnformatted(question);
@@ -192,10 +212,11 @@ bool confirm(const char *id, bool *ask, const char *question, const char *yes, c
     ImGui::SetItemDefaultFocus();
     ImGui::SameLine();
     if (ImGui::Button(cancel, ImVec2(w, 0)) || ImGui::IsKeyPressed(ImGuiKey_Escape, false) ||
-        ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, false))
+        ImGui::IsKeyPressed(ImGuiKey_GamepadFaceRight, false)) {
         ImGui::CloseCurrentPopup();
+    }
     ImGui::EndPopup();
     return confirmed;
 }
 
-}
+} // namespace formae::ui

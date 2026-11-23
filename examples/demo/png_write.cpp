@@ -10,14 +10,19 @@ namespace {
 uint32_t crc32(const unsigned char *p, size_t n, uint32_t crc = 0)
 {
     static uint32_t table[256];
-    if (!table[1])
+    if (!table[1]) {
         for (uint32_t i = 0; i < 256; i++) {
             uint32_t c = i;
-            for (int k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320u ^ (c >> 1) : c >> 1;
+            for (int k = 0; k < 8; k++) {
+                c = c & 1 ? 0xEDB88320u ^ (c >> 1) : c >> 1;
+            }
             table[i] = c;
         }
+    }
     crc = ~crc;
-    for (size_t i = 0; i < n; i++) crc = table[(crc ^ p[i]) & 255] ^ (crc >> 8);
+    for (size_t i = 0; i < n; i++) {
+        crc = table[(crc ^ p[i]) & 255] ^ (crc >> 8);
+    }
     return ~crc;
 }
 
@@ -38,11 +43,13 @@ void chunk(std::vector<unsigned char> &out, const char *kind, const std::vector<
     put32(out, crc32(typed.data(), typed.size()));
 }
 
-}
+} // namespace
 
 bool png_write(const char *path, const uint32_t *argb, int width, int height)
 {
-    if (width <= 0 || height <= 0) return false;
+    if (width <= 0 || height <= 0) {
+        return false;
+    }
     std::vector<unsigned char> raw;
     raw.reserve((size_t)height * ((size_t)width * 4 + 1));
     for (int y = 0; y < height; y++) {
@@ -69,7 +76,9 @@ bool png_write(const char *path, const uint32_t *argb, int width, int height)
         z.push_back((unsigned char)~n);
         z.push_back((unsigned char)(~n >> 8));
         z.insert(z.end(), raw.begin() + (ptrdiff_t)at, raw.begin() + (ptrdiff_t)(at + n));
-        if (raw.empty()) break;
+        if (raw.empty()) {
+            break;
+        }
     }
     put32(z, b << 16 | a);
     std::vector<unsigned char> ihdr;
@@ -81,7 +90,9 @@ bool png_write(const char *path, const uint32_t *argb, int width, int height)
     chunk(out, "IDAT", z);
     chunk(out, "IEND", {});
     FILE *f = std::fopen(path, "wb");
-    if (!f) return false;
+    if (!f) {
+        return false;
+    }
     const bool ok = std::fwrite(out.data(), 1, out.size(), f) == out.size();
     return std::fclose(f) == 0 && ok;
 }

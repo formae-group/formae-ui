@@ -73,8 +73,9 @@ int keys[ACTION_COUNT] = { SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_RETURN, 
 int pads[ACTION_COUNT] = { 1 + SDL_CONTROLLER_BUTTON_A, 1 + SDL_CONTROLLER_BUTTON_X, 1 + SDL_CONTROLLER_BUTTON_START,
                            1 + SDL_CONTROLLER_BUTTON_START };
 
-const char *const BUTTONS[] = { "A", "B", "X", "Y", "Back", "Guide", "Start", "Left stick", "Right stick", "LB", "RB",
-                                "D-pad up", "D-pad down", "D-pad left", "D-pad right" };
+const char *const BUTTONS[] = { "A",     "B",        "X",          "Y",           "Back",
+                                "Guide", "Start",    "Left stick", "Right stick", "LB",
+                                "RB",    "D-pad up", "D-pad down", "D-pad left",  "D-pad right" };
 const char *const AXES[] = { "Left stick X", "Left stick Y", "Right stick X", "Right stick Y", "LT", "RT" };
 
 bool binding_text(int row, int column, char *out, size_t cap)
@@ -84,9 +85,13 @@ bool binding_text(int row, int column, char *out, size_t cap)
         std::snprintf(out, cap, "Unbound");
         return false;
     }
-    if (!column) std::snprintf(out, cap, "%s", SDL_GetScancodeName((SDL_Scancode)v));
-    else if (v >= 100) std::snprintf(out, cap, "%s %s", (v - 100) / 2 < 6 ? AXES[(v - 100) / 2] : "Axis", (v - 100) % 2 ? "+" : "-");
-    else std::snprintf(out, cap, "%s", v - 1 < (int)(sizeof BUTTONS / sizeof BUTTONS[0]) ? BUTTONS[v - 1] : "Button");
+    if (!column) {
+        std::snprintf(out, cap, "%s", SDL_GetScancodeName((SDL_Scancode)v));
+    } else if (v >= 100) {
+        std::snprintf(out, cap, "%s %s", (v - 100) / 2 < 6 ? AXES[(v - 100) / 2] : "Axis", (v - 100) % 2 ? "+" : "-");
+    } else {
+        std::snprintf(out, cap, "%s", v - 1 < (int)(sizeof BUTTONS / sizeof BUTTONS[0]) ? BUTTONS[v - 1] : "Button");
+    }
     return true;
 }
 
@@ -98,12 +103,21 @@ const char *binding_assign(int row, int column, const ui::InputEvent *e)
         return nullptr;
     }
     int v = 0;
-    if (e->type == ui::InputEvent::key_down) v = e->code;
-    else if (e->type == ui::InputEvent::button_down) v = 1 + e->code;
-    else if (e->type == ui::InputEvent::axis) v = 100 + e->code * 2 + (e->value > 0 ? 1 : 0);
-    if (!column && row != MENU_ROW && v == SDL_SCANCODE_ESCAPE) return "Escape stays with the menu; choose another key.";
-    for (int r = 0; r < ACTION_COUNT; r++)
-        if (r != row && table[r] == v) table[r] = table[row];
+    if (e->type == ui::InputEvent::key_down) {
+        v = e->code;
+    } else if (e->type == ui::InputEvent::button_down) {
+        v = 1 + e->code;
+    } else if (e->type == ui::InputEvent::axis) {
+        v = 100 + e->code * 2 + (e->value > 0 ? 1 : 0);
+    }
+    if (!column && row != MENU_ROW && v == SDL_SCANCODE_ESCAPE) {
+        return "Escape stays with the menu; choose another key.";
+    }
+    for (int r = 0; r < ACTION_COUNT; r++) {
+        if (r != row && table[r] == v) {
+            table[r] = table[row];
+        }
+    }
     table[row] = v;
     return nullptr;
 }
@@ -111,8 +125,8 @@ const char *binding_assign(int row, int column, const ui::InputEvent *e)
 void binding_defaults()
 {
     const int k[ACTION_COUNT] = { SDL_SCANCODE_Z, SDL_SCANCODE_X, SDL_SCANCODE_RETURN, SDL_SCANCODE_ESCAPE };
-    const int p[ACTION_COUNT] = { 1 + SDL_CONTROLLER_BUTTON_A, 1 + SDL_CONTROLLER_BUTTON_X, 1 + SDL_CONTROLLER_BUTTON_START,
-                                  1 + SDL_CONTROLLER_BUTTON_START };
+    const int p[ACTION_COUNT] = { 1 + SDL_CONTROLLER_BUTTON_A, 1 + SDL_CONTROLLER_BUTTON_X,
+                                  1 + SDL_CONTROLLER_BUTTON_START, 1 + SDL_CONTROLLER_BUTTON_START };
     std::memcpy(keys, k, sizeof keys);
     std::memcpy(pads, p, sizeof pads);
 }
@@ -121,7 +135,9 @@ ImTextureID create_texture(void *user, const uint32_t *argb, int width, int heig
 {
     SDL_Renderer *ren = static_cast<SDL_Renderer *>(user);
     SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, width, height);
-    if (!tex) return 0;
+    if (!tex) {
+        return 0;
+    }
     SDL_SetTextureBlendMode(tex, SDL_BLENDMODE_BLEND);
     SDL_SetTextureScaleMode(tex, SDL_ScaleModeLinear);
     SDL_UpdateTexture(tex, nullptr, argb, width * 4);
@@ -137,34 +153,34 @@ ui::InputEvent translate(const SDL_Event &e)
 {
     ui::InputEvent t;
     switch (e.type) {
-    case SDL_KEYDOWN:
-    case SDL_KEYUP: {
-        const SDL_Scancode sc = e.key.keysym.scancode;
-        t.type = e.type == SDL_KEYDOWN ? ui::InputEvent::key_down : ui::InputEvent::key_up;
-        t.code = sc;
-        t.repeat = e.key.repeat != 0;
-        t.cancel = sc == SDL_SCANCODE_ESCAPE;
-        t.clear = sc == SDL_SCANCODE_DELETE || sc == SDL_SCANCODE_BACKSPACE;
-        t.menu = sc == keys[MENU_ROW];
-        break;
-    }
-    case SDL_CONTROLLERBUTTONDOWN:
-    case SDL_CONTROLLERBUTTONUP:
-        t.type = e.type == SDL_CONTROLLERBUTTONDOWN ? ui::InputEvent::button_down : ui::InputEvent::button_up;
-        t.code = e.cbutton.button;
-        t.back = e.cbutton.button == SDL_CONTROLLER_BUTTON_B;
-        t.menu = 1 + e.cbutton.button == pads[MENU_ROW];
-        break;
-    case SDL_CONTROLLERAXISMOTION:
-        t.type = ui::InputEvent::axis;
-        t.code = e.caxis.axis;
-        t.value = e.caxis.value;
-        break;
-    case SDL_MOUSEBUTTONDOWN:
-        t.type = ui::InputEvent::mouse_down;
-        break;
-    default:
-        break;
+        case SDL_KEYDOWN:
+        case SDL_KEYUP: {
+            const SDL_Scancode sc = e.key.keysym.scancode;
+            t.type = e.type == SDL_KEYDOWN ? ui::InputEvent::key_down : ui::InputEvent::key_up;
+            t.code = sc;
+            t.repeat = e.key.repeat != 0;
+            t.cancel = sc == SDL_SCANCODE_ESCAPE;
+            t.clear = sc == SDL_SCANCODE_DELETE || sc == SDL_SCANCODE_BACKSPACE;
+            t.menu = sc == keys[MENU_ROW];
+            break;
+        }
+        case SDL_CONTROLLERBUTTONDOWN:
+        case SDL_CONTROLLERBUTTONUP:
+            t.type = e.type == SDL_CONTROLLERBUTTONDOWN ? ui::InputEvent::button_down : ui::InputEvent::button_up;
+            t.code = e.cbutton.button;
+            t.back = e.cbutton.button == SDL_CONTROLLER_BUTTON_B;
+            t.menu = 1 + e.cbutton.button == pads[MENU_ROW];
+            break;
+        case SDL_CONTROLLERAXISMOTION:
+            t.type = ui::InputEvent::axis;
+            t.code = e.caxis.axis;
+            t.value = e.caxis.value;
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            t.type = ui::InputEvent::mouse_down;
+            break;
+        default:
+            break;
     }
     return t;
 }
@@ -173,7 +189,7 @@ SDL_Texture *make_picture(SDL_Renderer *ren)
 {
     const int w = 320, h = 180;
     std::vector<uint32_t> px((size_t)w * h);
-    for (int y = 0; y < h; y++)
+    for (int y = 0; y < h; y++) {
         for (int x = 0; x < w; x++) {
             const float dx = (x - w * 0.5f) / w, dy = (y - h * 0.4f) / h;
             const float glow = 1.0f - (dx * dx + dy * dy) * 2.2f;
@@ -186,8 +202,11 @@ SDL_Texture *make_picture(SDL_Renderer *ren)
             }
             px[(size_t)y * w + x] = 0xFF000000u | (uint32_t)r << 16 | (uint32_t)gr << 8 | (uint32_t)b;
         }
+    }
     SDL_Texture *tex = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, w, h);
-    if (!tex) return nullptr;
+    if (!tex) {
+        return nullptr;
+    }
     SDL_SetTextureScaleMode(tex, SDL_ScaleModeNearest);
     SDL_UpdateTexture(tex, nullptr, px.data(), w * 4);
     return tex;
@@ -195,7 +214,9 @@ SDL_Texture *make_picture(SDL_Renderer *ren)
 
 void draw_picture(SDL_Renderer *ren, SDL_Texture *pic, int ow, int oh)
 {
-    if (!pic) return;
+    if (!pic) {
+        return;
+    }
     const SDL_Rect dst = { 0, 0, ow, oh };
     SDL_RenderCopy(ren, pic, nullptr, &dst);
 }
@@ -204,7 +225,9 @@ float display_dpi(SDL_Window *win)
 {
     float ddpi = 0.0f;
     const int display = SDL_GetWindowDisplayIndex(win);
-    if (display >= 0 && SDL_GetDisplayDPI(display, &ddpi, nullptr, nullptr) == 0 && ddpi > 0.0f) return ddpi;
+    if (display >= 0 && SDL_GetDisplayDPI(display, &ddpi, nullptr, nullptr) == 0 && ddpi > 0.0f) {
+        return ddpi;
+    }
     return 96.0f;
 }
 
@@ -219,12 +242,18 @@ struct Step {
 ImGuiKey script_key(char c)
 {
     switch (c) {
-    case 'U': return ImGuiKey_UpArrow;
-    case 'D': return ImGuiKey_DownArrow;
-    case 'L': return ImGuiKey_LeftArrow;
-    case 'R': return ImGuiKey_RightArrow;
-    case 'E': return ImGuiKey_Enter;
-    default: return ImGuiKey_Space;
+        case 'U':
+            return ImGuiKey_UpArrow;
+        case 'D':
+            return ImGuiKey_DownArrow;
+        case 'L':
+            return ImGuiKey_LeftArrow;
+        case 'R':
+            return ImGuiKey_RightArrow;
+        case 'E':
+            return ImGuiKey_Enter;
+        default:
+            return ImGuiKey_Space;
     }
 }
 
@@ -257,21 +286,32 @@ bool shot(SDL_Renderer *ren, int w, int h, const std::string &dir, const char *n
     return ok;
 }
 
-}
+} // namespace
 
 int main(int argc, char **argv)
 {
     std::string selftest;
-    for (int i = 1; i + 1 < argc; i++)
-        if (!std::strcmp(argv[i], "--selftest")) selftest = argv[i + 1];
+    for (int i = 1; i + 1 < argc; i++) {
+        if (!std::strcmp(argv[i], "--selftest")) {
+            selftest = argv[i + 1];
+        }
+    }
     const bool hidden = !selftest.empty();
     std::error_code made;
-    if (hidden) std::filesystem::create_directories(selftest, made);
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) return 2;
+    if (hidden) {
+        std::filesystem::create_directories(selftest, made);
+    }
+    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER) != 0) {
+        return 2;
+    }
     SDL_Window *win = SDL_CreateWindow("Demo Quest", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 960, 640,
-                                       SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | (hidden ? SDL_WINDOW_HIDDEN : 0));
-    SDL_Renderer *ren = win ? SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC) : nullptr;
-    if (win && !ren) ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
+                                       SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI |
+                                           (hidden ? SDL_WINDOW_HIDDEN : 0));
+    SDL_Renderer *ren = win ? SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)
+                            : nullptr;
+    if (win && !ren) {
+        ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_SOFTWARE);
+    }
     if (!ren) {
         std::fprintf(stderr, "formae_ui_demo: no window: %s\n", SDL_GetError());
         return 2;
@@ -282,7 +322,9 @@ int main(int argc, char **argv)
         ImGui_ImplSDL2_InitForSDLRenderer(win, ren);
         ImGui_ImplSDLRenderer2_Init(ren);
         auto fit = [&](int height, float dpi) {
-            if (context.fit(ui::base_size(height, dpi))) ImGui_ImplSDLRenderer2_DestroyFontsTexture();
+            if (context.fit(ui::base_size(height, dpi))) {
+                ImGui_ImplSDLRenderer2_DestroyFontsTexture();
+            }
         };
         ui::Logo logo(formae_logo_png, formae_logo_png_size, { ren, create_texture, destroy_texture });
         SDL_Texture *picture = make_picture(ren);
@@ -291,7 +333,9 @@ int main(int argc, char **argv)
         bindings.columns = { { "Keyboard", ui::Device::keyboard, "Press a key" },
                              { "Controller", ui::Device::gamepad, "Press a button" } };
         bindings.rows = ACTION_COUNT;
-        bindings.label = [](int row) { return ACTIONS[row]; };
+        bindings.label = [](int row) {
+            return ACTIONS[row];
+        };
         bindings.text = binding_text;
         bindings.assign = binding_assign;
         bindings.restore_label = "Restore default controls";
@@ -347,26 +391,41 @@ int main(int argc, char **argv)
                     [] {
                         ui::section("Mods");
                         ui::toggle("Enable mods", &settings.mods);
-                        ui::tag(settings.mods != settings.mods_started || settings.mods_changed ? ui::restart_to_apply : nullptr);
+                        ui::tag(settings.mods != settings.mods_started || settings.mods_changed ? ui::restart_to_apply
+                                                                                                : nullptr);
                         ui::ListOptions list;
                         list.visible_rows = 5.0f;
                         list.header = "Load order";
                         list.empty = "No mods installed. Put mods in the mods folder, then refresh.";
-                        if (ui::reorder_list("##mods", mods, list).kind != ui::ListEdit::none) settings.mods_changed = true;
-                        ui::note("Mods higher in the list override the ones below them. Changes apply after a restart.");
-                        for (const ui::ListRow &row : mods)
+                        if (ui::reorder_list("##mods", mods, list).kind != ui::ListEdit::none) {
+                            settings.mods_changed = true;
+                        }
+                        ui::note(
+                            "Mods higher in the list override the ones below them. Changes apply after a restart.");
+                        for (const ui::ListRow &row : mods) {
                             if (!row.error.empty()) {
                                 ui::note((row.name + " cannot be loaded and stays off.").c_str(), ui::Status::error);
                                 break;
                             }
+                        }
                         ImGui::Spacing();
-                        if (ui::inline_button("Open mods folder")) settings.mods_status = "The mods folder would open here.";
+                        if (ui::inline_button("Open mods folder")) {
+                            settings.mods_status = "The mods folder would open here.";
+                        }
                         ImGui::SameLine();
-                        if (ui::inline_button("Refresh")) settings.mods_status = "Found 6 mods.";
-                        if (settings.mods_status) ui::note(settings.mods_status, ui::Status::ok);
+                        if (ui::inline_button("Refresh")) {
+                            settings.mods_status = "Found 6 mods.";
+                        }
+                        if (settings.mods_status) {
+                            ui::note(settings.mods_status, ui::Status::ok);
+                        }
                     } } },
                 nullptr },
-              { "About", {}, [&] { ui::about_page(about); } } },
+              { "About",
+                {},
+                [&] {
+                    ui::about_page(about);
+                } } },
             { { "##reset", ui::Icon::reset, false, "Reset the game?", "Reset" },
               { "##quit", ui::Icon::quit, true, "Quit Demo Quest?", "Quit" },
               { "##resume", ui::Icon::resume } });
@@ -389,26 +448,43 @@ int main(int argc, char **argv)
         Uint64 verified_at = 0;
         auto apply = [&](const Step &s) {
             menu.select(s.tab, s.category);
-            if (s.capture >= 0) menu.begin_capture(&bindings, s.capture, 0);
-            else menu.end_capture();
+            if (s.capture >= 0) {
+                menu.begin_capture(&bindings, s.capture, 0);
+            } else {
+                menu.end_capture();
+            }
             menu.ask(s.popup);
-            if (s.keys) menu.focus_page();
+            if (s.keys) {
+                menu.focus_page();
+            }
             welcome.status = s.status;
             welcome.busy = s.status == ui::Status::ok;
-            welcome.status_text = s.status == ui::Status::ok ? "Verified. Starting the game."
-                                  : s.status == ui::Status::error ? "This file is not the one the game needs." : nullptr;
-            welcome.detail = s.status == ui::Status::error ? "SHA-256 of this file: 0123456789abcdef\nExpected: fedcba9876543210" : nullptr;
+            welcome.status_text = s.status == ui::Status::ok      ? "Verified. Starting the game."
+                                  : s.status == ui::Status::error ? "This file is not the one the game needs."
+                                                                  : nullptr;
+            welcome.detail = s.status == ui::Status::error
+                                 ? "SHA-256 of this file: 0123456789abcdef\nExpected: fedcba9876543210"
+                                 : nullptr;
         };
-        if (hidden) apply(SCRIPT[0]);
+        if (hidden) {
+            apply(SCRIPT[0]);
+        }
         while (!quit) {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
-                if (ev.type == SDL_QUIT) quit = true;
+                if (ev.type == SDL_QUIT) {
+                    quit = true;
+                }
                 if (in_menu && !hidden) {
                     const ui::EventResult r = menu.event(translate(ev));
-                    if (r == ui::EventResult::close) in_menu = false;
-                    if (r != ui::EventResult::pass) continue;
-                } else if (!in_first_run && !hidden && ev.type == SDL_KEYDOWN && ev.key.keysym.scancode == keys[MENU_ROW]) {
+                    if (r == ui::EventResult::close) {
+                        in_menu = false;
+                    }
+                    if (r != ui::EventResult::pass) {
+                        continue;
+                    }
+                } else if (!in_first_run && !hidden && ev.type == SDL_KEYDOWN &&
+                           ev.key.keysym.scancode == keys[MENU_ROW]) {
                     in_menu = true;
                     continue;
                 }
@@ -420,7 +496,9 @@ int main(int argc, char **argv)
             const Step *s = hidden ? &SCRIPT[step] : nullptr;
             if (s) {
                 if (!target || target_w != s->w || target_h != s->h) {
-                    if (target) SDL_DestroyTexture(target);
+                    if (target) {
+                        SDL_DestroyTexture(target);
+                    }
                     target = SDL_CreateTexture(ren, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_TARGET, s->w, s->h);
                     target_w = s->w;
                     target_h = s->h;
@@ -438,7 +516,9 @@ int main(int argc, char **argv)
             SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
             SDL_RenderClear(ren);
             const bool first = s ? s->first_run : in_first_run;
-            if (!first) draw_picture(ren, picture, ow, oh);
+            if (!first) {
+                draw_picture(ren, picture, ow, oh);
+            }
             ImGui_ImplSDLRenderer2_NewFrame();
             ImGui_ImplSDL2_NewFrame();
             const int keys_len = s && s->keys ? (int)std::strlen(s->keys) : 0;
@@ -448,12 +528,16 @@ int main(int argc, char **argv)
                 io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
                 io.DeltaTime = 1.0f / 60.0f;
                 const int k = frames - 2;
-                if (k >= 0 && k < 2 * keys_len) io.AddKeyEvent(script_key(s->keys[k / 2]), k % 2 == 0);
+                if (k >= 0 && k < 2 * keys_len) {
+                    io.AddKeyEvent(script_key(s->keys[k / 2]), k % 2 == 0);
+                }
             }
             ImGui::NewFrame();
             if (first) {
                 const ui::FirstRunAction a = first_run.draw(welcome);
-                if (a == ui::FirstRunAction::secondary && !s) quit = true;
+                if (a == ui::FirstRunAction::secondary && !s) {
+                    quit = true;
+                }
                 if (a == ui::FirstRunAction::primary && !s) {
                     welcome.status = ui::Status::ok;
                     welcome.status_text = "Verified. Starting the game.";
@@ -462,26 +546,41 @@ int main(int argc, char **argv)
                 }
             } else if (s || in_menu) {
                 const int pressed = menu.draw(settings.opacity);
-                if (pressed == 1 && !s) quit = true;
-                if ((pressed == 0 || pressed == 2) && !s) in_menu = false;
+                if (pressed == 1 && !s) {
+                    quit = true;
+                }
+                if ((pressed == 0 || pressed == 2) && !s) {
+                    in_menu = false;
+                }
             }
             ImGui::Render();
             ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), ren);
             if (s && ++frames == 6 + (keys_len ? 2 + 2 * keys_len : 0)) {
                 frames = 0;
-                if (!shot(ren, ow, oh, selftest, s->name)) status = 1;
-                if (++step == sizeof SCRIPT / sizeof SCRIPT[0]) quit = true;
-                else apply(SCRIPT[step]);
+                if (!shot(ren, ow, oh, selftest, s->name)) {
+                    status = 1;
+                }
+                if (++step == sizeof SCRIPT / sizeof SCRIPT[0]) {
+                    quit = true;
+                } else {
+                    apply(SCRIPT[step]);
+                }
             }
-            if (s) SDL_SetRenderTarget(ren, nullptr);
+            if (s) {
+                SDL_SetRenderTarget(ren, nullptr);
+            }
             if (verified_at && SDL_GetTicks64() - verified_at > 900) {
                 in_first_run = false;
                 verified_at = 0;
             }
             SDL_RenderPresent(ren);
         }
-        if (target) SDL_DestroyTexture(target);
-        if (picture) SDL_DestroyTexture(picture);
+        if (target) {
+            SDL_DestroyTexture(target);
+        }
+        if (picture) {
+            SDL_DestroyTexture(picture);
+        }
         logo.release();
         ImGui_ImplSDLRenderer2_Shutdown();
         ImGui_ImplSDL2_Shutdown();

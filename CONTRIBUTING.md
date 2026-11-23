@@ -52,8 +52,12 @@ PNGs of its menu; they must be identical before and after the change.
 
 - C++17, the library depends on Dear ImGui and the standard library only. No platform headers, no
   backend calls, no game-specific text, setting or name in `include/` or `src/`.
-- Four-space indentation, CRLF line endings, UTF-8 (`.editorconfig`, `.gitattributes`).
-  `.clang-format` describes the layout.
+- Four-space indentation, CRLF line endings, UTF-8 (`.editorconfig`, `.gitattributes`), 120 columns,
+  braces on every `if` and loop, no one-line functions or statements. `.clang-format` describes the
+  C++ layout and `[tool.black]` in `pyproject.toml` the Python one; `py -3 tools/format.py` applies
+  both and `py -3 tools/format.py --check` must list nothing before a commit. The pinned tools are
+  `py -3 -m pip install --user clang-format==23.1.5 black==26.10.1`. `examples/imgui/` and
+  `src/third_party/` are never formatted.
 - Each file opens with a header comment that says what it is for. Public declarations carry a short
   doc comment. No comments inside function bodies.
 - Names are `snake_case` for functions and variables, `PascalCase` for types, everything in

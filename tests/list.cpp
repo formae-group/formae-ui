@@ -30,7 +30,9 @@ void expect(bool ok, const char *what)
 std::string order(const std::vector<ui::ListRow> &rows)
 {
     std::string ids;
-    for (const ui::ListRow &row : rows) ids += row.id;
+    for (const ui::ListRow &row : rows) {
+        ids += row.id;
+    }
     return ids;
 }
 
@@ -39,7 +41,7 @@ bool is(const std::vector<ui::ListEdit> &edits, ui::ListEdit::Kind kind, int row
     return edits.size() == 1 && edits[0].kind == kind && edits[0].row == row && edits[0].to == to;
 }
 
-}
+} // namespace
 
 int main()
 {
@@ -56,7 +58,9 @@ int main()
                                       { "c", "Gamma", "", "Made for a different game version", true },
                                       { "d", "Delta", "", "", true } };
     std::vector<ui::ListRow> many;
-    for (int i = 0; i < 8; i++) many.push_back({ std::to_string(i), "Row " + std::to_string(i), "", "", true });
+    for (int i = 0; i < 8; i++) {
+        many.push_back({ std::to_string(i), "Row " + std::to_string(i), "", "", true });
+    }
     ui::ListOptions scrolling;
     scrolling.visible_rows = 2.0f;
     std::vector<ui::ListEdit> edits;
@@ -68,14 +72,18 @@ int main()
                       { { "List",
                           [&] {
                               const ui::ListEdit e = ui::reorder_list("##mods", rows);
-                              if (e.kind != ui::ListEdit::none) edits.push_back(e);
+                              if (e.kind != ui::ListEdit::none) {
+                                  edits.push_back(e);
+                              }
                               last = ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
                           } },
                         { "Scrolling",
                           [&] {
                               ui::toggle("Above", &above);
                               const ui::ListEdit e = ui::reorder_list("##many", many, scrolling);
-                              if (e.kind != ui::ListEdit::none) edits.push_back(e);
+                              if (e.kind != ui::ListEdit::none) {
+                                  edits.push_back(e);
+                              }
                               const ImVector<ImGuiWindow *> &children = ImGui::GetCurrentWindow()->DC.ChildWindows;
                               scroll = children.Size ? children.back()->Scroll.y : -1.0f;
                               below += ui::inline_button("Below");
@@ -171,10 +179,15 @@ int main()
     expect(scroll == 0.0f, "a scrolling list starts at the top");
     tap(ImGuiKey_DownArrow);
     tap(ImGuiKey_Enter);
-    expect(is(edits, ui::ListEdit::moved, 0, 1) && !above && !below, "Down from the page enters a scrolling list beside a sidebar");
-    for (int i = 0; i < 4; i++) tap(ImGuiKey_Enter);
+    expect(is(edits, ui::ListEdit::moved, 0, 1) && !above && !below,
+           "Down from the page enters a scrolling list beside a sidebar");
+    for (int i = 0; i < 4; i++) {
+        tap(ImGuiKey_Enter);
+    }
     expect(order(many) == "12345067" && scroll > 0.0f, "a row moved in a scrolling list is scrolled into view");
-    for (int i = 0; i < 3; i++) tap(ImGuiKey_DownArrow);
+    for (int i = 0; i < 3; i++) {
+        tap(ImGuiKey_DownArrow);
+    }
     tap(ImGuiKey_Space);
     expect(below == 1 && !above, "Down from the last row leaves the list for the page");
 
