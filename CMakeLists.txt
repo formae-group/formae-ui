@@ -12,7 +12,7 @@
 #   FORMAE_UI_BUILD_EXAMPLES  examples/ (SDL2, ImGui v1.91.9b from examples/imgui)
 #   FORMAE_UI_INSTALL         install rules and the package config
 cmake_minimum_required(VERSION 3.20)
-project(formae_ui VERSION 0.2.1 DESCRIPTION "Dear ImGui menu library for Formae's game ports" LANGUAGES C CXX)
+project(formae_ui VERSION 0.3.0 DESCRIPTION "Dear ImGui menu library for Formae's game ports" LANGUAGES C CXX)
 
 if(CMAKE_VERSION VERSION_LESS 3.21)
     string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${PROJECT_SOURCE_DIR}" PROJECT_IS_TOP_LEVEL)

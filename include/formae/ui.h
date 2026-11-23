@@ -146,15 +146,23 @@ constexpr const char *restart_to_apply = "Restart to apply";
 void section(const char *title);
 // Accent text on the same line as the previous item; nothing when text is null.
 void tag(const char *text);
+// help, on the setting widgets below, is what the setting does: a dimmed
+// "(?)" after the label, and a tooltip with the text, wrapped, while the mouse
+// is over the marker or the control (also when it is disabled) or while
+// keyboard or gamepad navigation is on the control. Null draws nothing.
+
 // A checkbox. Returns true when it changed.
-bool toggle(const char *label, bool *value);
+bool toggle(const char *label, bool *value, const char *help = nullptr);
 // A label on the left and a combo on the right half. Returns true when it changed.
-bool combo(const char *label, int *value, const char *const *names, int count, const char *note = nullptr);
+bool combo(const char *label, int *value, const char *const *names, int count, const char *note = nullptr,
+           const char *help = nullptr);
 // A label above a slider with - and + buttons (repeating while held), clamped
 // to lo..hi. format is the slider's printf format. Returns true when it changed.
-bool slider(const char *label, int *value, int lo, int hi, int step, const char *format, const char *note = nullptr);
+bool slider(const char *label, int *value, int lo, int hi, int step, const char *format, const char *note = nullptr,
+            const char *help = nullptr);
 // slider with the "%d%%" format.
-bool slider_percent(const char *label, int *value, int lo, int hi, int step, const char *note = nullptr);
+bool slider_percent(const char *label, int *value, int lo, int hi, int step, const char *note = nullptr,
+                    const char *help = nullptr);
 // A full-width button. Returns true when pressed.
 bool button(const char *label);
 // A tab or category button, accent-filled while chosen. Returns true when

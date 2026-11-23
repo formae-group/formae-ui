@@ -106,8 +106,9 @@ int main()
                               ui::section("Section");
                               ui::slider_percent("Level", &level, 0, 100, 5, ui::restart_to_apply);
                               ui::slider("Scale", &level, 0, 100, 1, "%d\xC3\x97");
-                              ui::combo("Choice", &choice, names, 3);
-                              ui::toggle("Flag", &flag);
+                              ui::combo("Choice", &choice, names, 3, nullptr, "What the choice does.");
+                              ui::toggle("Flag", &flag, "What the flag does.");
+                              ui::slider("Help", &level, 0, 100, 1, "%d", nullptr, "What the level does.");
                               ui::button("Button");
                               ui::inline_button("Inline");
                               ui::note("Note", ui::Status::error);

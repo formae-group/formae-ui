@@ -1,6 +1,7 @@
 // widgets.cpp - the controls pages are made of (formae/ui.h): titled
 // section separators, the accent "Restart to apply" tag, toggles, combos,
-// sliders with - and + buttons that repeat while held, full-width and inline
+// sliders with - and + buttons that repeat while held, the "(?)" help marker
+// and tooltip of a setting, full-width and inline
 // buttons, wrapped notes in the dimmed, ok or error colour,
 // the tab and category buttons, the bar's icon buttons drawn with ImDrawList
 // and the centred confirmation dialog.
@@ -20,7 +21,55 @@ namespace {
 
 const float PI = 3.14159265f;
 
-}
+struct Help {
+    const char *text;
+    float x0 = ImGui::GetCursorScreenPos().x;
+    bool show = false;
+    bool mouse = false;
+    ImVec2 below;
+
+    void marker()
+    {
+        if (!text) {
+            return;
+        }
+        ImGui::SameLine();
+        ImGui::PushStyleColor(ImGuiCol_Text, current().theme().text_dim);
+        ImGui::TextUnformatted("(?)");
+        ImGui::PopStyleColor();
+        const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip);
+        show |= hovered;
+        mouse |= hovered;
+    }
+
+    void control()
+    {
+        if (!text) {
+            return;
+        }
+        const bool hovered = ImGui::IsItemHovered(ImGuiHoveredFlags_ForTooltip | ImGuiHoveredFlags_AllowWhenDisabled);
+        show |= hovered || (ImGui::IsItemFocused() && ImGui::GetCurrentContext()->NavCursorVisible);
+        mouse |= hovered;
+        below = ImVec2(x0, ImGui::GetItemRectMax().y + ImGui::GetStyle().ItemSpacing.y);
+    }
+
+    void draw() const
+    {
+        if (!text || !show) {
+            return;
+        }
+        if (!mouse) {
+            ImGui::SetNextWindowPos(below);
+        }
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(std::floor(current().fonts().base * 24.0f));
+        ImGui::TextUnformatted(text);
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+};
+
+} // namespace
 
 void section(const char *title)
 {
@@ -40,23 +89,32 @@ void tag(const char *text)
     ImGui::PopStyleColor();
 }
 
-bool toggle(const char *label, bool *value)
+bool toggle(const char *label, bool *value, const char *help)
 {
-    return ImGui::Checkbox(label, value);
+    Help h{ help };
+    const bool changed = ImGui::Checkbox(label, value);
+    h.control();
+    h.marker();
+    h.draw();
+    return changed;
 }
 
-bool combo(const char *label, int *value, const char *const *names, int count, const char *note)
+bool combo(const char *label, int *value, const char *const *names, int count, const char *note, const char *help)
 {
     bool changed = false;
+    Help h{ help };
     ImGui::PushID(label);
     const float x0 = ImGui::GetCursorPosX(), full = ImGui::GetContentRegionAvail().x, w = std::floor(full * 0.5f);
     ImGui::AlignTextToFramePadding();
     ImGui::TextUnformatted(label);
+    h.marker();
     tag(note);
     ImGui::SameLine(x0 + full - w);
     ImGui::SetNextItemWidth(w);
     const int cur = *value < 0 || *value >= count ? 0 : *value;
-    if (ImGui::BeginCombo("##choice", names[cur])) {
+    const bool open = ImGui::BeginCombo("##choice", names[cur]);
+    h.control();
+    if (open) {
         for (int i = 0; i < count; i++) {
             const bool selected = i == cur;
             if (ImGui::Selectable(names[i], selected) && !selected) {
@@ -68,16 +126,21 @@ bool combo(const char *label, int *value, const char *const *names, int count, c
             }
         }
         ImGui::EndCombo();
+    } else {
+        h.draw();
     }
     ImGui::PopID();
     return changed;
 }
 
-bool slider(const char *label, int *value, int lo, int hi, int step, const char *format, const char *note)
+bool slider(const char *label, int *value, int lo, int hi, int step, const char *format, const char *note,
+            const char *help)
 {
     const int was = *value;
+    Help h{ help };
     ImGui::PushID(label);
     ImGui::TextUnformatted(label);
+    h.marker();
     tag(note);
     const ImGuiStyle &s = ImGui::GetStyle();
     const float b = ImGui::GetFrameHeight(), w = ImGui::GetContentRegionAvail().x;
@@ -85,15 +148,19 @@ bool slider(const char *label, int *value, int lo, int hi, int step, const char 
     if (ImGui::Button(glyphs("\xE2\x88\x92##dec").c_str(), ImVec2(b, b))) {
         *value -= step;
     }
+    h.control();
     ImGui::SameLine(0, s.ItemInnerSpacing.x);
     ImGui::SetNextItemWidth(w - 2.0f * (b + s.ItemInnerSpacing.x));
     ImGui::SliderInt("##value", value, lo, hi, glyphs(format).c_str(),
                      ImGuiSliderFlags_AlwaysClamp | ImGuiSliderFlags_NoInput);
+    h.control();
     ImGui::SameLine(0, s.ItemInnerSpacing.x);
     if (ImGui::Button("+##inc", ImVec2(b, b))) {
         *value += step;
     }
+    h.control();
     ImGui::PopItemFlag();
+    h.draw();
     ImGui::PopID();
     if (*value < lo) {
         *value = lo;
@@ -104,9 +171,9 @@ bool slider(const char *label, int *value, int lo, int hi, int step, const char 
     return *value != was;
 }
 
-bool slider_percent(const char *label, int *value, int lo, int hi, int step, const char *note)
+bool slider_percent(const char *label, int *value, int lo, int hi, int step, const char *note, const char *help)
 {
-    return slider(label, value, lo, hi, step, "%d%%", note);
+    return slider(label, value, lo, hi, step, "%d%%", note, help);
 }
 
 bool button(const char *label)

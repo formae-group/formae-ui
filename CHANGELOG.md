@@ -6,6 +6,23 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-23
+
+### Added
+
+- Help markers: `toggle`, `combo`, `slider` and `slider_percent` take an optional last argument,
+  `help`, drawn as a dimmed "(?)" after the label with a tooltip of the text, shown to the mouse
+  (over the marker or the control, also when disabled) and under keyboard or gamepad focus, below
+  the row. Without it the widgets draw exactly as before.
+- Example: help on the General and Video settings, and a self-test shot of a tooltip under keyboard
+  navigation (`menu_13_settings_video_help`). README screenshots refreshed, with the help tooltip and
+  the Mods page.
+
+### Fixed
+
+- `tools/format.py --check` reports Python files again: Black ran with `--quiet`, which hid the
+  files it would change, so only C++ files could fail the check.
+
 ## [0.2.1] - 2026-11-23
 
 ### Changed
@@ -66,7 +83,8 @@ All notable changes to formae-ui are recorded here. The format follows
 - SDL2 example with an off-screen self-test, a headless smoke test, a package consumer test and a
   GitLab CI pipeline on Windows.
 
-[Unreleased]: https://github.com/formae-group/formae-ui/compare/v0.2.1...main
+[Unreleased]: https://github.com/formae-group/formae-ui/compare/v0.3.0...main
+[0.3.0]: https://github.com/formae-group/formae-ui/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/formae-group/formae-ui/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/formae-group/formae-ui/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/formae-group/formae-ui/releases/tag/v0.1.0

@@ -10,7 +10,8 @@
 //                                   fixed frame time and written to DIR as a
 //                                   PNG; the Mods page is also shot after
 //                                   scripted key presses that pick a row up
-//                                   and move it; exit code 0 when every PNG
+//                                   and move it, and the Video page with a
+//                                   setting's help tooltip; exit code 0 when every PNG
 //                                   was written
 //
 // Settings and bindings live in memory only. Everything here is what a game
@@ -273,6 +274,7 @@ const Step SCRIPT[] = {
     { true, 0, 0, -1, -1, 1280, 720, ui::Status::ok, "first_run_3_verified" },
     { false, 0, 4, -1, -1, 1280, 720, ui::Status::none, "menu_11_settings_mods" },
     { false, 0, 4, -1, -1, 1280, 720, ui::Status::none, "menu_12_settings_mods_moved", "DRREDD" },
+    { false, 0, 1, -1, -1, 1280, 720, ui::Status::none, "menu_13_settings_video_help", "R" },
 };
 
 bool shot(SDL_Renderer *ren, int w, int h, const std::string &dir, const char *name)
@@ -361,18 +363,24 @@ int main(int argc, char **argv)
                 { { "General",
                     [] {
                         ui::section("Menu");
-                        ui::slider_percent("Menu background opacity", &settings.opacity, 0, 100, 5);
-                        ui::toggle("Controller navigation", &settings.pad_nav);
+                        ui::slider_percent("Menu background opacity", &settings.opacity, 0, 100, 5, nullptr,
+                                           "How much of the game shows through the menu.");
+                        ui::toggle("Controller navigation", &settings.pad_nav,
+                                   "Move through the menu with the controller's D-pad and buttons.");
                         ui::section("Game");
-                        ui::combo("Difficulty", &settings.difficulty, DIFFICULTY, 3);
+                        ui::combo("Difficulty", &settings.difficulty, DIFFICULTY, 3, nullptr,
+                                  "Easy gives more health and fewer enemies; Hard gives less health.");
                         ui::toggle("Subtitles", &settings.subtitles);
                     } },
                   { "Video",
                     [] {
                         ui::section("Display");
-                        ui::combo("Display mode", &settings.display, DISPLAY, 3);
+                        ui::combo("Display mode", &settings.display, DISPLAY, 3, nullptr,
+                                  "Windowed keeps the desktop around the game. Borderless full screen covers the "
+                                  "screen and switches instantly; exclusive full screen takes over the display.");
                         ImGui::BeginDisabled(settings.display != 0);
-                        ui::slider("Window size", &settings.scale, 1, 8, 1, "%d\xC3\x97");
+                        ui::slider("Window size", &settings.scale, 1, 8, 1, "%d\xC3\x97", nullptr,
+                                   "The window's size as a multiple of the game's picture, in windowed mode.");
                         ImGui::EndDisabled();
                         ui::toggle("VSync", &settings.vsync);
                         ui::tag(settings.vsync != settings.vsync_started ? ui::restart_to_apply : nullptr);

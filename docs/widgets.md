@@ -14,6 +14,23 @@ A dimmed title with a rule after it. Start each group of settings with one.
 ui::section("Display");
 ```
 
+### Help markers
+
+`toggle`, `combo`, `slider` and `slider_percent` take an optional last argument, `help`: what the
+setting does, in a sentence or two. The widget then draws a dimmed "(?)" after its label and shows
+the text in a tooltip, wrapped to 24 base sizes, while the mouse is over the marker or the control
+(disabled controls included) or while keyboard or gamepad navigation is on the control; under
+navigation the tooltip opens just below the row. A null `help` draws exactly what the widget drew
+before, so existing pages keep their pixels.
+
+<img src="images/help.png" alt="A setting's help tooltip shown under keyboard navigation" width="640">
+
+```cpp
+ui::toggle("Integer scaling", &settings.integer_scale, "Scale the picture by whole numbers only.");
+ui::combo("Pixels", &settings.pixels, PIXELS, 3, nullptr, "How pixels are drawn when the picture is scaled.");
+ui::slider_percent("Master volume", &settings.volume, 0, 100, 5, nullptr, "The volume of everything the game plays.");
+```
+
 ### toggle
 
 A checkbox. Returns true when it changed.

@@ -24,8 +24,10 @@ handles keyboard, mouse and controller navigation.
 
 <div align="center">
 
-<img src="docs/images/settings.png" alt="Settings page with sliders, a combo and checkboxes" width="49%">
+<img src="docs/images/settings.png" alt="Settings page with sliders, a combo, checkboxes and help markers" width="49%">
+<img src="docs/images/help.png" alt="A setting's help tooltip shown under keyboard navigation" width="49%">
 <img src="docs/images/controls.png" alt="Controls page capturing a key binding" width="49%">
+<img src="docs/images/mods.png" alt="Mods page with a reorderable list, a row picked up and moved" width="49%">
 <img src="docs/images/about.png" alt="About page with version, developer logo and credits" width="49%">
 <img src="docs/images/first-run.png" alt="First-run screen refusing a file" width="49%">
 
@@ -40,6 +42,8 @@ handles keyboard, mouse and controller navigation.
 - **Widgets.** Titled section separators, toggles, combos, integer and percent sliders with - and +
   buttons that repeat while held, full-width and inline buttons, wrapped notes and a "Restart to
   apply" tag.
+- **Help on every setting.** An optional "(?)" after a toggle's, combo's or slider's label, with a
+  tooltip saying what the setting does, shown to the mouse and under keyboard or gamepad focus.
 - **Reorderable lists.** Mods or packs in priority order, moved with up and down buttons, Ctrl or
   Alt with the arrows, a gamepad pick-up or a mouse drag, and switched with a checkbox; rows can
   carry details and an error line.
@@ -77,7 +81,7 @@ has exactly one ImGui and one set of ImGui configuration macros.
 
 ```powershell
 git submodule add https://github.com/formae-group/formae-ui.git external/formae-ui
-git -C external/formae-ui checkout v0.2.1
+git -C external/formae-ui checkout v0.3.0
 ```
 
 ```cmake
