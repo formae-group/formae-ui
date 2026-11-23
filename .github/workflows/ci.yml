@@ -1,0 +1,121 @@
+# .github/workflows/ci.yml - builds formae-ui, its example and its tests on
+# Windows x64 (MSVC) and Linux x64 (GCC), runs the headless smoke and list
+# tests and the example's off-screen self-test (SDL's software renderer),
+# checks the installed package with tests/package and keeps the self-test
+# PNGs and the installed library of each platform. A vMAJOR.MINOR.PATCH tag
+# also publishes the GitHub release with both packages, described by the
+# version's CHANGELOG.md section.
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  SDL2_VERSION: "2.30.9"
+  SDL_RENDER_DRIVER: software
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-msvc
+            os: windows-2022
+            platform: windows-x64
+          - name: linux-gcc
+            os: ubuntu-24.04
+            platform: linux-x64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/libsdl-org/SDL/releases/download/release-$env:SDL2_VERSION/SDL2-devel-$env:SDL2_VERSION-VC.zip" -OutFile sdl2.zip
+          Expand-Archive sdl2.zip -DestinationPath "$env:RUNNER_TEMP/deps"
+          $sdl = "$env:RUNNER_TEMP/deps/SDL2-$env:SDL2_VERSION/cmake"
+          cmake -S . -B build -G "Visual Studio 17 2022" -A x64 "-DSDL2_DIR=$sdl"
+
+      - name: Configure (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libsdl2-dev fonts-dejavu-core
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          echo "SDL_VIDEODRIVER=offscreen" >> "$GITHUB_ENV"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: Install and test the package
+        shell: bash
+        run: |
+          cmake --install build --config Release --prefix "$PWD/install"
+          if [ "$RUNNER_OS" = Windows ]; then gen=(-G "Visual Studio 17 2022" -A x64); else gen=(-DCMAKE_BUILD_TYPE=Release); fi
+          cmake -S tests/package -B build-package "${gen[@]}" "-DCMAKE_PREFIX_PATH=$PWD/install"
+          cmake --build build-package --config Release
+          ctest --test-dir build-package -C Release --output-on-failure
+
+      - name: Archive the installed library
+        shell: bash
+        run: |
+          name="formae-ui-$(git describe --tags --always)-${{ matrix.platform }}"
+          mkdir -p "dist/$name"
+          cp -R install/. "dist/$name/"
+          cp LICENSE README.md CHANGELOG.md "dist/$name/"
+          cd dist
+          if [ "$RUNNER_OS" = Windows ]; then 7z a -bd "$name.zip" "$name" > /dev/null; else tar czf "$name.tar.gz" "$name"; fi
+          rm -rf "$name"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-${{ matrix.platform }}
+          path: dist/*
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selftest-${{ matrix.platform }}
+          path: build/examples/selftest/
+          if-no-files-found: ignore
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: package-*
+          path: dist
+          merge-multiple: true
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" 'index($0, "## [" v "]") == 1 { on = 1; next } on && /^## \[/ { exit } on && !/^\[[^]]+\]: / { print }' CHANGELOG.md | tr -d '\r' > notes.md
+          test -s notes.md
+          gh release create "$GITHUB_REF_NAME" dist/* --verify-tag --title "formae-ui $GITHUB_REF_NAME" --notes-file notes.md

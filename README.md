@@ -6,17 +6,17 @@
 
 A Dear ImGui menu library for PC ports: themed settings menus, input rebinding, About pages and first-run screens.
 
-[![pipeline status](https://gitlab.com/formae/formae-ui/badges/main/pipeline.svg)](https://gitlab.com/formae/formae-ui/-/pipelines)
-[![latest release](https://gitlab.com/formae/formae-ui/-/badges/release.svg)](https://gitlab.com/formae/formae-ui/-/releases)
+[![CI](https://github.com/formae-group/formae-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/formae-group/formae-ui/actions/workflows/ci.yml)
+[![latest release](https://img.shields.io/github/v/release/formae-group/formae-ui)](https://github.com/formae-group/formae-ui/releases)
 [![license: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![C++17](https://img.shields.io/badge/C%2B%2B-17-00599C.svg)](https://en.cppreference.com/w/cpp/17)
 [![Dear ImGui 1.91.9b](https://img.shields.io/badge/Dear%20ImGui-1.91.9b-4a4a4a.svg)](https://github.com/ocornut/imgui/releases/tag/v1.91.9b)
-[![platform: Windows](https://img.shields.io/badge/platform-Windows-0078D6.svg)](#requirements)
+[![platform: Windows | Linux](https://img.shields.io/badge/platform-Windows%20%7C%20Linux-0078D6.svg)](#requirements)
 
 </div>
 
-formae-ui is the menu layer of [Formae](https://gitlab.com/formae)'s game ports, extracted from
-[DuckTales Recompiled](https://gitlab.com/formae/ducktales-recompiled) so that every port shares one
+formae-ui is the menu layer of [Formae](https://github.com/formae-group)'s game ports, extracted from
+[DuckTales Recompiled](https://github.com/formae-group/ducktales-recompiled) so that every port shares one
 look and one set of behaviours. It is a small C++17 static library on top of
 [Dear ImGui](https://github.com/ocornut/imgui): the game supplies its pages, settings, texts and
 renderer; the library draws the shell, the widgets and the dialogs, scales them to the window and
@@ -58,13 +58,15 @@ handles keyboard, mouse and controller navigation.
 
 ## Requirements
 
-- A C++17 compiler. Tested with Visual Studio 2022 (MSVC v143) on Windows 10 and 11 x64.
+- A C++17 compiler. Tested with Visual Studio 2022 (MSVC v143) on Windows 10 and 11 x64, and with
+  GCC on Ubuntu 24.04 x64.
 - CMake 3.20 or later.
 - Dear ImGui 1.91.9b, supplied by your project (see [Installation](#installation)).
 - For the example only: SDL2 2.26 or later.
 
-The library code is portable C++ and its fonts fall back to ImGui's own on other systems, but
-Windows is the only platform built and tested.
+Windows x64 and Linux x64 are built and tested on every push by [GitHub Actions](.github/workflows/ci.yml).
+The library code is portable C++; its fonts are Segoe UI on Windows and DejaVu Sans on Linux, and
+fall back to ImGui's own font when those are missing.
 
 ## Installation
 
@@ -74,7 +76,7 @@ has exactly one ImGui and one set of ImGui configuration macros.
 ### As a submodule (recommended)
 
 ```powershell
-git submodule add https://gitlab.com/formae/formae-ui.git external/formae-ui
+git submodule add https://github.com/formae-group/formae-ui.git external/formae-ui
 git -C external/formae-ui checkout v0.2.0
 ```
 
@@ -225,11 +227,22 @@ checked without opening a visible window; `tests/smoke.cpp` exercises every comp
 `tests/list.cpp` drives the reorderable list with keyboard, gamepad and mouse input.
 
 ```powershell
-git clone --recurse-submodules https://gitlab.com/formae/formae-ui.git
+git clone --recurse-submodules https://github.com/formae-group/formae-ui.git
 cd formae-ui
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DSDL2_DIR=C:/path/to/SDL2/cmake
 cmake --build build --config Release --parallel
 ctest --test-dir build -C Release --output-on-failure
+```
+
+On Linux (Ubuntu 24.04 shown), the self-test runs on SDL's off-screen video driver:
+
+```sh
+sudo apt install cmake g++ libsdl2-dev fonts-dejavu-core
+git clone --recurse-submodules https://github.com/formae-group/formae-ui.git
+cd formae-ui
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+SDL_VIDEODRIVER=offscreen ctest --test-dir build --output-on-failure
 ```
 
 The PNGs are written to `build/examples/selftest/`.
@@ -238,12 +251,14 @@ The PNGs are written to `build/examples/selftest/`.
 
 formae-ui follows [Semantic Versioning](https://semver.org/). While the major version is 0, a minor
 release may change the API; patch releases never do. Releases are tagged `vMAJOR.MINOR.PATCH` and
-described in [CHANGELOG.md](CHANGELOG.md). `FORMAE_UI_VERSION_MAJOR`, `_MINOR` and `_PATCH` in
+described in [CHANGELOG.md](CHANGELOG.md). Each [GitHub release](https://github.com/formae-group/formae-ui/releases)
+carries the installed library (headers, static library and CMake package) built by CI for Windows x64
+(MSVC, Release, `/MD`) and Linux x64 (GCC). `FORMAE_UI_VERSION_MAJOR`, `_MINOR` and `_PATCH` in
 `formae/version.h` give the version at compile time.
 
 ## Contributing
 
-Issues and merge requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the setup, the
+Issues and pull requests are welcome. Read [CONTRIBUTING.md](CONTRIBUTING.md) for the setup, the
 checks and the style, and follow the [code of conduct](CODE_OF_CONDUCT.md). Report security issues
 as described in [SECURITY.md](SECURITY.md).
 

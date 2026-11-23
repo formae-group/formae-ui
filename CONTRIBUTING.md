@@ -7,12 +7,13 @@ and released.
 
 ## Setup
 
-Requirements: Windows x64, Visual Studio 2022 (*Desktop development with C++*), CMake 3.20 or
+Requirements on Windows x64: Visual Studio 2022 (*Desktop development with C++*), CMake 3.20 or
 later, Git, and the SDL2 development package for Visual C++
-([SDL2-devel-2.x-VC.zip](https://github.com/libsdl-org/SDL/releases)) for the example.
+([SDL2-devel-2.x-VC.zip](https://github.com/libsdl-org/SDL/releases)) for the example. On Linux x64:
+GCC or Clang with C++17, CMake 3.20 or later, Git and `libsdl2-dev`; the README shows the commands.
 
 ```powershell
-git clone --recurse-submodules https://gitlab.com/formae/formae-ui.git
+git clone --recurse-submodules https://github.com/formae-group/formae-ui.git
 cd formae-ui
 cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DSDL2_DIR=C:/path/to/SDL2-2.30.9/cmake
 cmake --build build --config Release --parallel
@@ -23,7 +24,7 @@ itself links whatever ImGui target its consumer provides.
 
 ## Checks
 
-Run all of them before opening a merge request:
+Run all of them before opening a pull request:
 
 ```powershell
 ctest --test-dir build -C Release --output-on-failure
@@ -72,10 +73,10 @@ One logical change per commit. The subject is a short imperative sentence in sen
 a prefix or a trailing period: *Add a percent variant of the slider*. Put the reason and the
 evidence (checks run, screenshots compared) in the body.
 
-## Merge requests
+## Pull requests
 
-Work on a branch and open a merge request against `main` using the default template. A merge
-request is accepted when the pipeline passes, the checks above pass, the documentation and the
+Work on a branch and open a pull request against `main` using the default template. A pull
+request is accepted when CI passes on Windows and Linux, the checks above pass, the documentation and the
 changelog are updated, and any visible change is shown with screenshots and agreed by a maintainer.
 
 ## Releasing
@@ -84,6 +85,7 @@ changelog are updated, and any visible change is shown with screenshots and agre
    `project(formae_ui VERSION ...)` in `CMakeLists.txt`.
 2. Commit (*Release 0.2.0*), then tag with the changelog section as the message:
    `git tag -a v0.2.0 -F <file with the 0.2.0 section>`.
-3. Push `main` and the tag. The tag's pipeline builds and tests the release and publishes the
-   GitLab release, whose description is the tag message.
+3. Push `main` and the tag. The tag's CI run builds and tests the release on Windows and Linux and
+   publishes the GitHub release with both packages; its notes are the version's `CHANGELOG.md`
+   section.
 4. Update the submodule in the consuming games.

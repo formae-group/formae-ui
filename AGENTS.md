@@ -18,7 +18,8 @@ loop, its settings and its texts.
 - Do not change the default look or behaviour unless that is the task: games compare their menu
   pixel for pixel across library updates.
 - Never open a visible window on the developer's desktop: run the example only with `--selftest`.
-- Windows x64 with Visual Studio 2022 is the supported platform.
+- Windows x64 (Visual Studio 2022) and Linux x64 (GCC) are the supported platforms; CI builds and
+  tests both on every push.
 - Do not push to `main`, tag or publish a release without being asked.
 
 ## Checks

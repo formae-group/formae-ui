@@ -1,3 +1,9 @@
+---
+name: Bug report
+about: Something formae-ui draws or does wrong
+labels: bug
+---
+
 ## Summary
 
 <!-- What went wrong, in one or two sentences. -->
@@ -16,7 +22,5 @@
 
 - formae-ui version or commit:
 - Dear ImGui version and backend:
-- Compiler and Windows version:
+- Compiler and operating system:
 - Game or example:
-
-/label ~bug

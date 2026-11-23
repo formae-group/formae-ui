@@ -2,7 +2,7 @@
 
 The library draws and decides; the game wires it to its window, its settings, its renderer and its
 input. This page describes each connection, with
-[DuckTales Recompiled](https://gitlab.com/formae/ducktales-recompiled) (`src/ui/app_ui.cpp`) as the
+[DuckTales Recompiled](https://github.com/formae-group/ducktales-recompiled) (`src/ui/app_ui.cpp`) as the
 reference integration: a C game on SDL2 and an `SDL_Renderer` (Direct3D 11) whose menu was the
 origin of this library.
 

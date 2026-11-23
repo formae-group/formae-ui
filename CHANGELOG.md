@@ -8,6 +8,11 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ### Changed
 
+- The project moved to GitHub: https://github.com/formae-group/formae-ui. CI is GitHub Actions
+  (`.github/workflows/ci.yml`): it builds and tests the library, the example and the installed
+  package on Windows x64 (MSVC) and Linux x64 (GCC), and a tag publishes the GitHub release with
+  the installed library for both. The GitLab pipeline and templates are replaced by GitHub's.
+- Linux x64 is a supported, tested platform (the library code needed no change).
 - One code layout for every C++ and Python source: `.clang-format` (4 spaces, 120 columns, braces
   always, no one-line statements) and Black, applied by `tools/format.py` (`--check` to verify).
 
@@ -59,6 +64,6 @@ All notable changes to formae-ui are recorded here. The format follows
 - SDL2 example with an off-screen self-test, a headless smoke test, a package consumer test and a
   GitLab CI pipeline on Windows.
 
-[Unreleased]: https://gitlab.com/formae/formae-ui/-/compare/v0.2.0...main
-[0.2.0]: https://gitlab.com/formae/formae-ui/-/compare/v0.1.0...v0.2.0
-[0.1.0]: https://gitlab.com/formae/formae-ui/-/tags/v0.1.0
+[Unreleased]: https://github.com/formae-group/formae-ui/compare/v0.2.0...main
+[0.2.0]: https://github.com/formae-group/formae-ui/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/formae-group/formae-ui/releases/tag/v0.1.0

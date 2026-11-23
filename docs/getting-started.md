@@ -7,7 +7,7 @@ This page takes a game from nothing to a working menu. The complete code is in
 ## 1. Add the library
 
 ```powershell
-git submodule add https://gitlab.com/formae/formae-ui.git external/formae-ui
+git submodule add https://github.com/formae-group/formae-ui.git external/formae-ui
 git -C external/formae-ui checkout v0.2.0
 ```
 

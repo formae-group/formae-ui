@@ -4,8 +4,8 @@
 
 ## Checks
 
-- [ ] `ctest --test-dir build -C Release` passes (smoke test and off-screen self-test)
-- [ ] `tests/package` builds against an install (CMake or packaging changes)
+- [ ] CI passes on Windows and Linux (smoke, list and off-screen self-test, package)
+- [ ] `py -3 tools/format.py --check` lists nothing
 - [ ] Visible changes: before and after self-test PNGs attached
 - [ ] Default look unchanged, or the change is the point and is agreed
 - [ ] README, `docs/` and `CHANGELOG.md` updated

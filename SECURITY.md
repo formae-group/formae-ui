@@ -6,16 +6,17 @@ Security fixes are made on `main` and released as a patch of the latest minor ve
 
 | Version | Supported |
 |---|---|
-| 0.1.x | Yes |
+| 0.2.x | Yes |
+| < 0.2 | No |
 
 ## Reporting a vulnerability
 
-Do not open a public issue. Report it privately by opening a **confidential issue** at
-https://gitlab.com/formae/formae-ui/-/issues/new (tick *This issue is confidential*), or by
-messaging a maintainer of the Formae group on GitLab. Include the version or commit, what an
+Do not open a public issue. Report it privately through GitHub's
+[private vulnerability reporting](https://github.com/formae-group/formae-ui/security/advisories/new)
+(*Security* tab, *Report a vulnerability*). Include the version or commit, what an
 attacker can do, and the steps or input (for example a crafted logo PNG) that reproduce it.
 
-You will get an answer within seven days. Once a fix is released, the issue is made public and the
+You will get an answer within seven days. Once a fix is released, the advisory is published and the
 reporter credited unless they ask otherwise.
 
 ## Scope

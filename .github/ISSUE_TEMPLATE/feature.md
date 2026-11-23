@@ -1,3 +1,9 @@
+---
+name: Feature request
+about: A component, option or behaviour the library should have
+labels: enhancement
+---
+
 ## Problem
 
 <!-- What a game or a player cannot do today. -->
@@ -13,5 +19,3 @@
 ## Games affected
 
 <!-- Which ports need it. formae-ui keeps no game-specific code. -->
-
-/label ~feature
