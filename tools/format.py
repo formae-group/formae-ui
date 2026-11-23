@@ -8,6 +8,7 @@ The pinned tools: py -3 -m pip install --user clang-format==23.1.5 black==26.10.
 (this script runs without -I so it can import them from the user site).
 Vendored code (examples/imgui/, src/third_party/) is never touched.
 """
+
 import argparse
 import os
 import shutil
@@ -22,7 +23,11 @@ C_SUFFIXES = {'.c', '.h', '.cpp', '.hpp'}
 
 def tracked(suffixes):
     out = subprocess.run(['git', 'ls-files'], cwd=ROOT, capture_output=True, text=True, check=True).stdout
-    return [ROOT / p for p in out.splitlines() if Path(p).suffix in suffixes and not p.startswith(('examples/imgui/', 'src/third_party/'))]
+    return [
+        ROOT / p
+        for p in out.splitlines()
+        if Path(p).suffix in suffixes and not p.startswith(('examples/imgui/', 'src/third_party/'))
+    ]
 
 
 def clang_format():
@@ -54,13 +59,20 @@ def main():
             if not args.check:
                 path.write_bytes(after)
 
-    black = [sys.executable, '-m', 'black', '--quiet']
-    if args.check:
-        result = subprocess.run(black + ['--check', '--list-different'] + [str(p) for p in py_files],
-                                cwd=ROOT, capture_output=True, text=True)
-        changed += [Path(line) for line in result.stdout.splitlines() if line.strip()]
+    black = [sys.executable, '-m', 'black']
+    if args.check and py_files:
+        result = subprocess.run(
+            black + ['--check'] + [str(p) for p in py_files],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode not in (0, 1):
+            sys.exit(result.stderr)
+        prefix = 'would reformat '
+        changed += [Path(line[len(prefix) :]) for line in result.stderr.splitlines() if line.startswith(prefix)]
     elif py_files:
-        subprocess.run(black + [str(p) for p in py_files], cwd=ROOT, check=True)
+        subprocess.run(black + ['--quiet'] + [str(p) for p in py_files], cwd=ROOT, check=True)
 
     for path in changed:
         print(path.relative_to(ROOT) if path.is_absolute() else path)
