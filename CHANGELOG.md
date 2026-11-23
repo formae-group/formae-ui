@@ -6,6 +6,8 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-23
+
 ### Changed
 
 - The project moved to GitHub: https://github.com/formae-group/formae-ui. CI is GitHub Actions
@@ -64,6 +66,7 @@ All notable changes to formae-ui are recorded here. The format follows
 - SDL2 example with an off-screen self-test, a headless smoke test, a package consumer test and a
   GitLab CI pipeline on Windows.
 
-[Unreleased]: https://github.com/formae-group/formae-ui/compare/v0.2.0...main
+[Unreleased]: https://github.com/formae-group/formae-ui/compare/v0.2.1...main
+[0.2.1]: https://github.com/formae-group/formae-ui/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/formae-group/formae-ui/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/formae-group/formae-ui/releases/tag/v0.1.0

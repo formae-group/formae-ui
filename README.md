@@ -77,7 +77,7 @@ has exactly one ImGui and one set of ImGui configuration macros.
 
 ```powershell
 git submodule add https://github.com/formae-group/formae-ui.git external/formae-ui
-git -C external/formae-ui checkout v0.2.0
+git -C external/formae-ui checkout v0.2.1
 ```
 
 ```cmake
