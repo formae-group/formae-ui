@@ -14,6 +14,11 @@
 //                                   setting's help tooltip; exit code 0 when every PNG
 //                                   was written
 //
+// Built with Emscripten, the same program runs in a browser page: the loop
+// runs from emscripten_set_main_loop, the fonts are DejaVu from /fonts, ImGui
+// works in device pixels so high-DPI screens stay sharp, and Quit stops the
+// loop and leaves a black canvas.
+//
 // Settings and bindings live in memory only. Everything here is what a game
 // supplies: the pages and their texts, the binding names and encoding, the
 // logo's texture callbacks and the translation of SDL events into
@@ -247,14 +252,16 @@ void to_pixels(SDL_Renderer *ren, SDL_Window *win, SDL_Event &e)
 float display_dpi(SDL_Window *win)
 {
 #ifdef __EMSCRIPTEN__
+    (void)win;
     return 96.0f * (float)emscripten_get_device_pixel_ratio();
-#endif
+#else
     float ddpi = 0.0f;
     const int display = SDL_GetWindowDisplayIndex(win);
     if (display >= 0 && SDL_GetDisplayDPI(display, &ddpi, nullptr, nullptr) == 0 && ddpi > 0.0f) {
         return ddpi;
     }
     return 96.0f;
+#endif
 }
 
 struct Step {

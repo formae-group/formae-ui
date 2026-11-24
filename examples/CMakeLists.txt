@@ -6,11 +6,24 @@
 # minimal/ is the README's example (built, never run by the tests).
 # "ctest -C Release" runs tests/smoke.cpp and tests/list.cpp (headless)
 # and the demo's off-screen self-test (demo/main.cpp).
+#
+# Under Emscripten (emcmake) SDL2 is Emscripten's port (-sUSE_SDL=2), the
+# demo is built as formae_ui_demo.html and FORMAE_UI_WEB_FONTS must name a
+# folder with DejaVuSans.ttf and DejaVuSans-Bold.ttf, which are preloaded
+# into the page's virtual file system as /fonts (docs/integration.md, Web).
+set(FORMAE_UI_WEB_FONTS "" CACHE PATH "Web build: folder with DejaVuSans.ttf and DejaVuSans-Bold.ttf")
 set(_imgui "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 if(NOT EXISTS "${_imgui}/imgui.h")
     message(FATAL_ERROR "examples/imgui is missing; run: git submodule update --init examples/imgui")
 endif()
 if(EMSCRIPTEN)
+    foreach(_font DejaVuSans.ttf DejaVuSans-Bold.ttf)
+        if(NOT EXISTS "${FORMAE_UI_WEB_FONTS}/${_font}")
+            message(FATAL_ERROR "formae-ui web build: no ${_font} in FORMAE_UI_WEB_FONTS ('${FORMAE_UI_WEB_FONTS}'). "
+                "Set -DFORMAE_UI_WEB_FONTS=<folder with DejaVuSans.ttf and DejaVuSans-Bold.ttf> "
+                "(DejaVu 2.37: https://github.com/dejavu-fonts/dejavu-fonts/releases).")
+        endif()
+    endforeach()
     add_library(SDL2::SDL2 INTERFACE IMPORTED)
     set_target_properties(SDL2::SDL2 PROPERTIES
         INTERFACE_COMPILE_OPTIONS "-sUSE_SDL=2"
