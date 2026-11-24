@@ -20,6 +20,9 @@
 // formae::ui::InputEvent.
 #define SDL_MAIN_HANDLED
 #include <SDL.h>
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 #include "imgui.h"
 #include "imgui_impl_sdl2.h"
@@ -320,7 +323,11 @@ int main(int argc, char **argv)
     }
     int status = 0;
     {
+#ifdef __EMSCRIPTEN__
+        ui::Context context(ui::Theme(), { "/fonts/DejaVuSans.ttf", "/fonts/DejaVuSans-Bold.ttf" });
+#else
         ui::Context context;
+#endif
         ImGui_ImplSDL2_InitForSDLRenderer(win, ren);
         ImGui_ImplSDLRenderer2_Init(ren);
         auto fit = [&](int height, float dpi) {
@@ -477,7 +484,7 @@ int main(int argc, char **argv)
         if (hidden) {
             apply(SCRIPT[0]);
         }
-        while (!quit) {
+        auto frame = [&] {
             SDL_Event ev;
             while (SDL_PollEvent(&ev)) {
                 if (ev.type == SDL_QUIT) {
@@ -513,7 +520,7 @@ int main(int argc, char **argv)
                 }
                 if (!target || SDL_SetRenderTarget(ren, target) != 0) {
                     status = 1;
-                    break;
+                    return false;
                 }
                 ow = s->w;
                 oh = s->h;
@@ -582,7 +589,27 @@ int main(int argc, char **argv)
                 verified_at = 0;
             }
             SDL_RenderPresent(ren);
+            return true;
+        };
+#ifdef __EMSCRIPTEN__
+        static std::function<void()> web_frame;
+        web_frame = [&] {
+            if (!frame() || quit) {
+                SDL_RenderClear(ren);
+                SDL_RenderPresent(ren);
+                emscripten_cancel_main_loop();
+                EM_ASM(document.title = 'Demo Quest (closed)';);
+            }
+        };
+        emscripten_set_main_loop(
+            [] {
+                web_frame();
+            },
+            0, true);
+#else
+        while (!quit && frame()) {
         }
+#endif
         if (target) {
             SDL_DestroyTexture(target);
         }
