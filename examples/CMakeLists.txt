@@ -10,7 +10,14 @@ set(_imgui "${CMAKE_CURRENT_SOURCE_DIR}/imgui")
 if(NOT EXISTS "${_imgui}/imgui.h")
     message(FATAL_ERROR "examples/imgui is missing; run: git submodule update --init examples/imgui")
 endif()
-find_package(SDL2 CONFIG REQUIRED)
+if(EMSCRIPTEN)
+    add_library(SDL2::SDL2 INTERFACE IMPORTED)
+    set_target_properties(SDL2::SDL2 PROPERTIES
+        INTERFACE_COMPILE_OPTIONS "-sUSE_SDL=2"
+        INTERFACE_LINK_OPTIONS "-sUSE_SDL=2")
+else()
+    find_package(SDL2 CONFIG REQUIRED)
+endif()
 
 if(NOT TARGET imgui)
     add_library(imgui STATIC
@@ -29,6 +36,14 @@ add_executable(formae_ui_demo demo/main.cpp demo/png_write.cpp)
 target_link_libraries(formae_ui_demo PRIVATE formae::ui imgui SDL2::SDL2)
 target_compile_definitions(formae_ui_demo PRIVATE _CRT_SECURE_NO_WARNINGS)
 formae_ui_embed_file(formae_ui_demo formae_logo_png "${CMAKE_CURRENT_SOURCE_DIR}/assets/formae.png")
+if(EMSCRIPTEN)
+    set_target_properties(formae_ui_demo PROPERTIES SUFFIX ".html")
+    target_link_options(formae_ui_demo PRIVATE
+        "-sALLOW_MEMORY_GROWTH=1"
+        "--shell-file=${_imgui}/examples/libs/emscripten/shell_minimal.html"
+        "--preload-file=${FORMAE_UI_WEB_FONTS}/DejaVuSans.ttf@/fonts/DejaVuSans.ttf"
+        "--preload-file=${FORMAE_UI_WEB_FONTS}/DejaVuSans-Bold.ttf@/fonts/DejaVuSans-Bold.ttf")
+endif()
 if(WIN32)
     add_custom_command(TARGET formae_ui_demo POST_BUILD
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "$<TARGET_FILE:SDL2::SDL2>" "$<TARGET_FILE_DIR:formae_ui_demo>"
