@@ -225,8 +225,30 @@ void draw_picture(SDL_Renderer *ren, SDL_Texture *pic, int ow, int oh)
     SDL_RenderCopy(ren, pic, nullptr, &dst);
 }
 
+#ifdef __EMSCRIPTEN__
+void to_pixels(SDL_Renderer *ren, SDL_Window *win, SDL_Event &e)
+{
+    int ww = 0, wh = 0, pw = 0, ph = 0;
+    SDL_GetWindowSize(win, &ww, &wh);
+    SDL_GetRendererOutputSize(ren, &pw, &ph);
+    if (ww <= 0 || wh <= 0) {
+        return;
+    }
+    if (e.type == SDL_MOUSEMOTION) {
+        e.motion.x = e.motion.x * pw / ww;
+        e.motion.y = e.motion.y * ph / wh;
+    } else if (e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP) {
+        e.button.x = e.button.x * pw / ww;
+        e.button.y = e.button.y * ph / wh;
+    }
+}
+#endif
+
 float display_dpi(SDL_Window *win)
 {
+#ifdef __EMSCRIPTEN__
+    return 96.0f * (float)emscripten_get_device_pixel_ratio();
+#endif
     float ddpi = 0.0f;
     const int display = SDL_GetWindowDisplayIndex(win);
     if (display >= 0 && SDL_GetDisplayDPI(display, &ddpi, nullptr, nullptr) == 0 && ddpi > 0.0f) {
@@ -503,6 +525,9 @@ int main(int argc, char **argv)
                     in_menu = true;
                     continue;
                 }
+#ifdef __EMSCRIPTEN__
+                to_pixels(ren, win, ev);
+#endif
                 ImGui_ImplSDL2_ProcessEvent(&ev);
             }
             int ow = 0, oh = 0;
@@ -536,6 +561,10 @@ int main(int argc, char **argv)
             }
             ImGui_ImplSDLRenderer2_NewFrame();
             ImGui_ImplSDL2_NewFrame();
+#ifdef __EMSCRIPTEN__
+            ImGui::GetIO().DisplaySize = ImVec2((float)ow, (float)oh);
+            ImGui::GetIO().DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+#endif
             const int keys_len = s && s->keys ? (int)std::strlen(s->keys) : 0;
             if (s) {
                 ImGuiIO &io = ImGui::GetIO();
