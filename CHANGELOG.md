@@ -6,6 +6,17 @@ All notable changes to formae-ui are recorded here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Example: `examples/demo` builds for the web with Emscripten (SDL2 port, `SDL_Renderer` on WebGL)
+  as `formae_ui_demo.html`. The fonts are DejaVu from the folder named by the new cache variable
+  `FORMAE_UI_WEB_FONTS` (configuring stops without them), the frame runs from
+  `emscripten_set_main_loop`, Quit stops the loop, and ImGui is drawn in device pixels so high-DPI
+  screens stay sharp and the mouse reaches the widgets where they are drawn. The library needed no
+  change; the Windows and Linux builds of the example are unchanged.
+- `docs/integration.md`: a Web (Emscripten) section with the build, the fonts, the main loop, Quit
+  and the high-DPI rule.
+
 ## [0.3.0] - 2026-11-23
 
 ### Added

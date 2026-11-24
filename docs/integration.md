@@ -140,6 +140,51 @@ The game owns the window and the file logic; the library owns the layout. DuckTa
 `FirstRunContent` each frame from its import state (verified, refused with the file's SHA-256, or
 waiting) and opens the Windows file dialog when `draw` returns `primary`.
 
+## Web (Emscripten)
+
+The library runs in a browser unchanged: it uses no threads and no platform API, and opens no file
+but its fonts. `examples/demo` builds for the web as the reference, with Emscripten's SDL2 port and
+`SDL_Renderer` (WebGL). With [emsdk](https://emscripten.org/docs/getting_started/downloads.html)
+activated and Ninja on the `PATH`:
+
+```powershell
+emcmake cmake -S . -B build-web -G Ninja -DCMAKE_BUILD_TYPE=Release -DFORMAE_UI_INSTALL=OFF `
+    -DFORMAE_UI_WEB_FONTS=C:/path/to/dejavu-fonts-ttf-2.37/ttf
+cmake --build build-web --target formae_ui_demo --parallel
+py -3 -m http.server 8642 --bind 127.0.0.1 --directory build-web/examples
+```
+
+Then open `http://127.0.0.1:8642/formae_ui_demo.html`; the page needs HTTP, not `file://`. What a
+web port changes, all of it in the game:
+
+- **Fonts.** A browser has no system fonts and `Context` loads TrueType files by path. Preload them
+  into Emscripten's file system (`--preload-file <dir>/DejaVuSans.ttf@/fonts/DejaVuSans.ttf`, the
+  same for `DejaVuSans-Bold.ttf`) and name them:
+  `ui::Context context(ui::Theme(), { "/fonts/DejaVuSans.ttf", "/fonts/DejaVuSans-Bold.ttf" });`.
+  The example takes the folder from `FORMAE_UI_WEB_FONTS` and stops at configure time without it.
+- **Main loop.** The browser owns the loop. Move the body of the frame loop into a function and pass
+  it to `emscripten_set_main_loop(frame, 0, true)`, which calls it once per animation frame.
+- **Quit.** There is no process to end: leave the Quit button and the first-run screen's secondary
+  action out of the web build, or stop the loop with `emscripten_cancel_main_loop()` and clear the
+  canvas as the example does.
+- **High-DPI screens.** With `SDL_WINDOW_ALLOW_HIGHDPI` the canvas has `devicePixelRatio` pixels per
+  CSS pixel, and ImGui's SDL2 backend reports `DisplaySize` in CSS pixels with that ratio as
+  `DisplayFramebufferScale`. `fit()` and the renderer must use ImGui's coordinate space. Either
+  draw ImGui in device pixels, as the example does: after `ImGui_ImplSDL2_NewFrame` set
+  `io.DisplaySize` to the renderer's output size and `io.DisplayFramebufferScale` to 1, scale mouse
+  event coordinates by output size over window size before `ImGui_ImplSDL2_ProcessEvent`, and pass
+  `fit()` the output height with 96 × `devicePixelRatio` as the DPI; the fonts stay sharp. Or keep
+  ImGui in CSS pixels: call `SDL_RenderSetScale(renderer, scale.x, scale.y)` before
+  `ImGui_ImplSDLRenderer2_RenderDrawData` and pass `fit()` the window height; the layout is right
+  but the fonts are drawn upscaled. Mixing the two (the output height to `fit()`, no render scale)
+  draws the menu in a corner of the canvas with wrong clipping while the mouse still reaches the
+  widgets where they should be.
+- **Renderer.** `SDL_Renderer` needs nothing more. ImGui's OpenGL 3 backend needs WebGL 2
+  (`-sMAX_WEBGL_VERSION=2`, an OpenGL ES 3.0 context and GLSL `#version 300 es`).
+
+The game's own storage (settings, imported data) needs browser storage such as Emscripten's IDBFS,
+and the first-run screen's file choice an `<input type="file">` or a dropped file.
+
 ## Self-test
 
 A port should be able to show its menu without a visible window. DuckTales' `DUCKTALES_UI_SELFTEST`

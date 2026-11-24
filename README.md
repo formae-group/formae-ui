@@ -251,6 +251,9 @@ SDL_VIDEODRIVER=offscreen ctest --test-dir build --output-on-failure
 
 The PNGs are written to `build/examples/selftest/`.
 
+The example also builds for the web with Emscripten (not built by CI); the commands and what a web
+port changes are in [docs/integration.md](docs/integration.md#web-emscripten).
+
 ## Versioning
 
 formae-ui follows [Semantic Versioning](https://semver.org/). While the major version is 0, a minor
